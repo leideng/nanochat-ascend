@@ -1,0 +1,7 @@
+[project]
+name = "nanochat-ascend"
+version = "0.1.0"
+description = "training a nano ChatGPT via a 8*910C ascend npu node"
+readme = "README.md"
+requires-python = "~=3.11.0"
+dependencies = []
