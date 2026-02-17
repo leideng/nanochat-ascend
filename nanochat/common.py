@@ -114,7 +114,7 @@ def get_dist_info():
 
 def autodetect_device_type():
     # prefer to use ascend npu if available, otherwise use CPU
-    if torch.has_attr("npu") and torch.npu.is_available():
+    if hasattr(torch, "npu") and torch.npu.is_available():
         device_type = "npu"
     else:
         device_type = "cpu"
