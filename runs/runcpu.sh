@@ -24,7 +24,7 @@ fi
 
 # train tokenizer on ~2B characters (~34 seconds on my MacBook Pro M3 Max)
 python -m nanochat.dataset 
-python -m scripts.tok_train --max-chars=2000000000
+python -m scripts.tok_train --max-chars=2000000
 python -m scripts.tok_eval
 
 # train a small 4 layer model
@@ -41,7 +41,7 @@ python -m scripts.base_train \
     --eval-tokens=524288 \
     --core-metric-every=-1 \
     --sample-every=100 \
-    --num-iterations=5000 \
+    --num-iterations=100 \
     --run=$WANDB_RUN
 python -m scripts.base_eval --device-batch-size=1 --split-tokens=16384 --max-per-task=16
 
