@@ -9,6 +9,7 @@ dependencies = [
     "psutil>=7.2.2",
     "pyarrow>=23.0.1",
     "rustbpe>=0.1.0",
+    "setuptools>=70.2.0",
     "tiktoken>=0.12.0",
     "tokenizers>=0.22.2",
     "torch==2.9.0",
