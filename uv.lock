@@ -344,6 +344,7 @@ source = { virtual = "." }
 dependencies = [
     { name = "numpy" },
     { name = "pyarrow" },
+    { name = "rustbpe" },
     { name = "tokenizers" },
     { name = "torch", version = "2.9.0", source = { registry = "https://download.pytorch.org/whl/cpu" }, marker = "sys_platform == 'darwin'" },
     { name = "torch", version = "2.9.0+cpu", source = { registry = "https://download.pytorch.org/whl/cpu" }, marker = "sys_platform != 'darwin'" },
@@ -365,6 +366,7 @@ dev = [
 requires-dist = [
     { name = "numpy", specifier = ">=2.3.5" },
     { name = "pyarrow", specifier = ">=23.0.1" },
+    { name = "rustbpe", specifier = ">=0.1.0" },
     { name = "tokenizers", specifier = ">=0.22.2" },
     { name = "torch", specifier = "==2.9.0" },
     { name = "torch", marker = "extra == 'cpu'", specifier = ">=2.9.0" },
@@ -611,6 +613,21 @@ dependencies = [
 sdist = { url = "https://files.pythonhosted.org/packages/74/99/a4cab2acbb884f80e558b0771e97e21e939c5dfb460f488d19df485e8298/rich-14.3.2.tar.gz", hash = "sha256:e712f11c1a562a11843306f5ed999475f09ac31ffb64281f73ab29ffdda8b3b8", size = 230143, upload-time = "2026-02-01T16:20:47.908Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/ef/45/615f5babd880b4bd7d405cc0dc348234c5ffb6ed1ea33e152ede08b2072d/rich-14.3.2-py3-none-any.whl", hash = "sha256:08e67c3e90884651da3239ea668222d19bea7b589149d8014a21c633420dbb69", size = 309963, upload-time = "2026-02-01T16:20:46.078Z" },
+]
+
+[[package]]
+name = "rustbpe"
+version = "0.1.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/03/2e/f16e179ad1e185f0bb5a8fc2376fff05d1eeefcb6d8a77ee04306e8a42ae/rustbpe-0.1.0.tar.gz", hash = "sha256:18765f62ac579a9ff9e89c611f9c9b9e46bd1adde9be3f59c00b6eb4e1f28b3a", size = 29723, upload-time = "2026-01-03T22:24:11.872Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/16/c1/d4fadf70d1cc0914c812a9c7c1e5cce0813440f7d16082fdb399ec33748d/rustbpe-0.1.0-cp311-cp311-macosx_10_12_x86_64.whl", hash = "sha256:400be6ede8875d5ac0e0ac91dfba1ec7ea7d359353b0465da633576cf01c7de7", size = 1008245, upload-time = "2026-01-03T22:23:40.245Z" },
+    { url = "https://files.pythonhosted.org/packages/8d/e1/ac7d4044dbee242bbcb7d9fc425f6ea8c52f984c7708cbb4cb9633976b96/rustbpe-0.1.0-cp311-cp311-macosx_11_0_arm64.whl", hash = "sha256:dff3ffb6f05576a27732d2013f044ec6f137bc7bce6773a5e134cfc0c24dcc82", size = 949344, upload-time = "2026-01-03T22:23:41.664Z" },
+    { url = "https://files.pythonhosted.org/packages/2a/7b/008e45858130eb803085d131a05e6e55c123a2b63b763ea08a45aa8b7673/rustbpe-0.1.0-cp311-cp311-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:92a0186ed815ccec376cca23c4bc5f209f6c67efeb101c1c935345cd63cc9eea", size = 1031915, upload-time = "2026-01-03T22:23:42.93Z" },
+    { url = "https://files.pythonhosted.org/packages/1f/6e/d10c687670c42d34306713ae75d6477d6c32424bd251033bd9ff2a243ccd/rustbpe-0.1.0-cp311-cp311-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:fec78edb30f3264d0db69ffd7ac333d695be76e4e672fd5301626787bc1220c2", size = 1076476, upload-time = "2026-01-03T22:23:43.899Z" },
+    { url = "https://files.pythonhosted.org/packages/78/a8/f64b877d0a0239f4262a90d74ded014f1e2c4250c6273898280739177a7b/rustbpe-0.1.0-cp311-cp311-win_amd64.whl", hash = "sha256:0f35a858c31faf09e6723fe2e8c020efcf4e036b7270ed151ca8538fad1fe0c5", size = 916888, upload-time = "2026-01-03T22:23:44.936Z" },
+    { url = "https://files.pythonhosted.org/packages/96/a2/02498910b4852967fd4b6d77ce94542c5483f1551decb6911480229d116c/rustbpe-0.1.0-pp311-pypy311_pp73-manylinux_2_17_aarch64.manylinux2014_aarch64.whl", hash = "sha256:ba8e08ed3cc7a7bf832f70c86c64a94d0112e8c526d55a1f40e53ede2ca14d22", size = 1031327, upload-time = "2026-01-03T22:24:09.246Z" },
+    { url = "https://files.pythonhosted.org/packages/49/13/78d768a451dc9e634f933f2231b3fa9be524955ed84317b40e5528a2d906/rustbpe-0.1.0-pp311-pypy311_pp73-manylinux_2_17_x86_64.manylinux2014_x86_64.whl", hash = "sha256:9f419fd428e8ffd2430945a694cb5177706550ee5c9b16737ba860ecccd5acff", size = 1075802, upload-time = "2026-01-03T22:24:10.573Z" },
 ]
 
 [[package]]
