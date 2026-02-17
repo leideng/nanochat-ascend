@@ -8,6 +8,12 @@ dependencies = [
     "numpy>=2.3.5",
     "pyarrow>=23.0.1",
     "torch==2.9.0",
+    "wandb>=0.25.0",
+]
+
+[project.optional-dependencies]
+cpu = [
+    "torch>=2.9.0",
 ]
 
 [[tool.uv.index]]
