@@ -6,6 +6,7 @@ readme = "README.md"
 requires-python = "~=3.11.0"
 dependencies = [
     "numpy>=2.3.5",
+    "psutil>=7.2.2",
     "pyarrow>=23.0.1",
     "rustbpe>=0.1.0",
     "tiktoken>=0.12.0",
