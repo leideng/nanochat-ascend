@@ -11,9 +11,13 @@
 # You may also want to run this script manually and one by one, copy pasting commands into your terminal.
 
 # all the setup stuff
-export NANOCHAT_BASE_DIR="$HOME/.cache/nanochat"
+export NANOCHAT_BASE_DIR=$(yq -r '.servers.local.NANOCHAT_BASE_DIR' configs/servers.yaml)
 mkdir -p $NANOCHAT_BASE_DIR
-export NANOCHAT_BASE_DATA_DIR="/home/leo/dataset/fineweb-edu-100b-shuffle"
+echo "NANOCHAT_BASE_DIR: $NANOCHAT_BASE_DIR"
+
+export NANOCHAT_BASE_DATA_DIR=$(yq -r '.servers.local.NANOCHAT_BASE_DATA_DIR' configs/servers.yaml)
+echo "NANOCHAT_BASE_DATA_DIR: $NANOCHAT_BASE_DATA_DIR"
+
 command -v uv &> /dev/null || curl -LsSf https://astral.sh/uv/install.sh | sh
 [ -d ".venv" ] || uv venv
 uv sync --extra cpu

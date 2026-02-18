@@ -40,7 +40,7 @@ def parquets_iter_batched(split, data_dir=None, start=0, step=1):
 
 # you can run it in the project root directory by running `python -m nanochat.dataset`
 if __name__ == "__main__":
-    base_data_dir = "/home/leo/dataset/fineweb-edu-100b-shuffle"
+    base_data_dir = "/home/leo/dataset/fineweb-edu-100b-shuffle-sample"
 
     parquet_files = list_parquet_files(base_data_dir)   
     

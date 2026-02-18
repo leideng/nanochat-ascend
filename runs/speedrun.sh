@@ -12,10 +12,13 @@
 
 # Default intermediate artifacts directory is in ~/.cache/nanochat
 export OMP_NUM_THREADS=1
-export NANOCHAT_BASE_DIR="$HOME/.cache/nanochat"
+export NANOCHAT_BASE_DIR=$(yq -r '.servers.a3.NANOCHAT_BASE_DIR' configs/servers.yaml)
+mkdir -p $NANOCHAT_BASE_DIR
+echo "NANOCHAT_BASE_DIR: $NANOCHAT_BASE_DIR"
+
 mkdir -p $NANOCHAT_BASE_DIR
 export NANOCHAT_BASE_DATA_DIR=$(yq -r '.servers.a3.NANOCHAT_BASE_DATA_DIR' configs/servers.yaml)
-
+echo "NANOCHAT_BASE_DATA_DIR: $NANOCHAT_BASE_DATA_DIR"
 # -----------------------------------------------------------------------------
 # Python venv setup with uv
 
