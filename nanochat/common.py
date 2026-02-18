@@ -146,7 +146,7 @@ def compute_init(device_type="npu"): # npu|cpu
     if is_ddp_requested and device_type == "npu":
         device = torch.device("npu", ddp_local_rank)
         torch.npu.set_device(device)  # make npu default to this device
-        dist.init_process_group(backend="hccl", device_id=device)
+        dist.init_process_group(backend="hccl", rank=ddp_rank, world_size=ddp_world_size, device_id=device)
         dist.barrier()
     else:
         device = torch.device(device_type) # cpu

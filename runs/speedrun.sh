@@ -62,9 +62,9 @@ python -m scripts.tok_eval
 # Base model (pretraining)
 
 # d24 model (slightly overtrained is enough to beat GPT-2 => increase data:params ratio from compute optimal 10.5 (default) to 12)
-torchrun --standalone --nproc_per_node=16 -m scripts.base_train -- --depth=26 --target-param-data-ratio=8.25 --device-batch-size=16 --run=$WANDB_RUN
+torchrun --standalone --nproc_per_node=16 --master-addr=127.0.0.1 -m scripts.base_train -- --depth=26 --target-param-data-ratio=8.25 --device-batch-size=16 --run=$WANDB_RUN
 # evaluate the model: CORE metric, BPB on train/val, and draw samples
-torchrun --standalone --nproc_per_node=16 -m scripts.base_eval -- --device-batch-size=16
+torchrun --standalone --nproc_per_node=16 --master-addr=127.0.0.1 -m scripts.base_eval -- --device-batch-size=16
 
 # -----------------------------------------------------------------------------
 # SFT (teach the model conversation special tokens, tool use, multiple choice)
@@ -74,8 +74,8 @@ torchrun --standalone --nproc_per_node=16 -m scripts.base_eval -- --device-batch
 curl -L -o $NANOCHAT_BASE_DIR/identity_conversations.jsonl https://karpathy-public.s3.us-west-2.amazonaws.com/identity_conversations.jsonl
 
 # run SFT and eval the model
-torchrun --standalone --nproc_per_node=16 -m scripts.chat_sft -- --device-batch-size=16 --run=$WANDB_RUN
-torchrun --standalone --nproc_per_node=16 -m scripts.chat_eval -- -i sft
+torchrun --standalone --nproc_per_node=16 --master-addr=127.0.0.1 -m scripts.chat_sft -- --device-batch-size=16 --run=$WANDB_RUN
+torchrun --standalone --nproc_per_node=16 --master-addr=127.0.0.1 -m scripts.chat_eval -- -i sft
 
 # chat with the model over CLI! Leave out the -p to chat interactively
 # python -m scripts.chat_cli -p "Why is the sky blue?"

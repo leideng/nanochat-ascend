@@ -66,7 +66,7 @@ for d in "${DEPTHS[@]}"; do
         DEVICE_BATCH_SIZE_ARG="--device-batch-size=32"
     fi
 
-    torchrun --standalone --nproc_per_node=$NPROC_PER_NODE -m scripts.base_train -- \
+    torchrun --standalone --nproc_per_node=$NPROC_PER_NODE --master-addr=127.0.0.1 -m scripts.base_train -- \
         --depth=$d \
         --run="${WANDB_RUN}_d${d}" \
         --model-tag="${TAG}" \
