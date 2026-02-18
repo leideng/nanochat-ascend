@@ -1,0 +1,12 @@
+servers:
+  local:
+    device: cpu
+    NANOCHAT_BASE_DATA_DIR: /home/leo/dataset/fineweb-edu-100b-shuffle
+
+  a2:
+    device: 910B
+    NANOCHAT_BASE_DATA_DIR: /docker/ldeng/dataset/fineweb-edu-100b-shuffle
+
+  a3:
+    device: 910C
+    NANOCHAT_BASE_DATA_DIR: /home/leo/dataset/fineweb-edu-100b-shuffle
