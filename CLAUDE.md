@@ -58,7 +58,6 @@ The codebase has two layers: **nanochat/** (core library) and **scripts/** (entr
 - **tokenizer.py** — BPE tokenizer with dual backend: HuggingFace Tokenizer or RustBPE+Tiktoken. GPT-4 split pattern. Special tokens: `<|bos|>`, `<|user_start|>`, `<|assistant_start|>`, `<|python_start|>`, etc.
 - **dataloader.py** — Distributed data loader using BOS-aligned best-fit cropping (every row starts with BOS, no padding, ~35% tokens cropped at T=2048). Multi-threaded with DDP sharding.
 - **flash_attention.py** — FA3 on Hopper+ (sm90), PyTorch SDPA fallback elsewhere. Handles both training and inference (with KV cache).
-- **fp8.py** — Minimal FP8 training for H100+ using tensorwise dynamic scaling and `torch._scaled_mm`.
 - **common.py** — Device autodetection (NPU→CUDA→CPU), DDP init (HCCL for NPU, NCCL for CUDA), logging, `print0()` for rank-0 output, peak FLOPS tables.
 - **checkpoint_manager.py** — Save/load model+optimizer+metadata, bfloat16→float32 conversion for CPU, torch.compile key patching.
 - **core_eval.py** — CORE metric evaluation (from DCLM paper), few-shot prompting, multiple-choice scoring.
@@ -66,7 +65,7 @@ The codebase has two layers: **nanochat/** (core library) and **scripts/** (entr
 
 ### Scripts (scripts/)
 
-- **base_train.py** — Pre-training with configurable depth, attention pattern, FP8, compute-budget or Chinchilla-ratio targets.
+- **base_train.py** — Pre-training with configurable depth, attention pattern, compute-budget or Chinchilla-ratio targets.
 - **chat_sft.py** — Multi-task SFT mixing GSM8K, MMLU, SmolTalk, SpellingBee, custom JSON.
 - **chat_rl.py** — Policy gradient RL training.
 - **chat_eval.py** — Generative and categorical evaluation (HumanEval, MMLU, ARC, GSM8K).
