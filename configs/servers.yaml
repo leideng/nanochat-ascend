@@ -9,4 +9,4 @@ servers:
 
   a3:
     device: 910C
-    NANOCHAT_BASE_DATA_DIR: /home/leo/dataset/fineweb-edu-100b-shuffle
+    NANOCHAT_BASE_DATA_DIR: /data/ldeng/dataset/fineweb-edu-100b-shuffle
