@@ -20,6 +20,9 @@ dependencies = [
 cpu = [
     "torch>=2.9.0",
 ]
+npu = [
+    "torch-npu==2.9.0",
+]
 
 [[tool.uv.index]]
 url = "https://download.pytorch.org/whl/cpu"
