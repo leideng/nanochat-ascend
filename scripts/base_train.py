@@ -155,7 +155,12 @@ if resuming:
 # Compile the model
 
 orig_model = model # original, uncompiled model, for saving raw model state_dict and for inference/evaluation (because the shapes may change shape)
-model = torch.compile(model, dynamic=False) # the inputs to model will never change shape so dynamic=False is safe
+if device_type == "npu":
+    import torchair
+    npu_backend = torchair.get_npu_backend(compiler_config=torchair.CompilerConfig())
+    model = torch.compile(model, backend=npu_backend, dynamic=False)
+else:
+    model = torch.compile(model, dynamic=False)
 
 # -----------------------------------------------------------------------------
 # Scaling laws and muP extrapolations to determine the optimal training horizon, batch size, learning rates, weight decay.
