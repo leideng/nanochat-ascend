@@ -235,7 +235,7 @@ class GPT(nn.Module):
         self.cos, self.sin = cos, sin
 
         # Cast embeddings to bf16: optimizer can tolerate it and it saves memory
-        if self.transformer.wte.weight.device.type == "cuda":
+        if self.transformer.wte.weight.device.type == "npu":
             self.transformer.wte.to(dtype=torch.bfloat16)
             for ve in self.value_embeds.values():
                 ve.to(dtype=torch.bfloat16)

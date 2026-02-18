@@ -41,12 +41,12 @@ def get_git_info():
 
     return info
 
-def get_gpu_info():
-    """Get GPU information."""
-    if not torch.cuda.is_available():
+def get_npu_info():
+    """Get NPU information."""
+    if not (hasattr(torch, "npu") and torch.npu.is_available()):
         return {"available": False}
 
-    num_devices = torch.cuda.device_count()
+    num_devices = torch.npu.device_count()
     info = {
         "available": True,
         "count": num_devices,
@@ -55,12 +55,9 @@ def get_gpu_info():
     }
 
     for i in range(num_devices):
-        props = torch.cuda.get_device_properties(i)
+        props = torch.npu.get_device_properties(i)
         info["names"].append(props.name)
         info["memory_gb"].append(props.total_memory / (1024**3))
-
-    # Get CUDA version
-    info["cuda_version"] = torch.version.cuda or "unknown"
 
     return info
 
@@ -86,45 +83,20 @@ def get_system_info():
 
     return info
 
-def estimate_cost(gpu_info, runtime_hours=None):
-    """Estimate training cost based on GPU type and runtime."""
-
-    # Rough pricing, from Lambda Cloud
-    default_rate = 2.0
-    gpu_hourly_rates = {
-        "H100": 3.00,
-        "A100": 1.79,
-        "V100": 0.55,
-    }
-
-    if not gpu_info.get("available"):
+def estimate_cost(npu_info, runtime_hours=None):
+    """Estimate training cost based on NPU type and runtime."""
+    if not npu_info.get("available"):
         return None
-
-    # Try to identify GPU type from name
-    hourly_rate = None
-    gpu_name = gpu_info["names"][0] if gpu_info["names"] else "unknown"
-    for gpu_type, rate in gpu_hourly_rates.items():
-        if gpu_type in gpu_name:
-            hourly_rate = rate * gpu_info["count"]
-            break
-
-    if hourly_rate is None:
-        hourly_rate = default_rate * gpu_info["count"]  # Default estimate
-
-    return {
-        "hourly_rate": hourly_rate,
-        "gpu_type": gpu_name,
-        "estimated_total": hourly_rate * runtime_hours if runtime_hours else None
-    }
+    return None  # No standard pricing for Ascend NPUs
 
 def generate_header():
     """Generate the header for a training report."""
     timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
     git_info = get_git_info()
-    gpu_info = get_gpu_info()
+    npu_info = get_npu_info()
     sys_info = get_system_info()
-    cost_info = estimate_cost(gpu_info)
+    cost_info = estimate_cost(npu_info)
 
     header = f"""# nanochat training report
 
@@ -143,15 +115,14 @@ Generated: {timestamp}
 - Memory: {sys_info['memory_gb']:.1f} GB
 """
 
-    if gpu_info.get("available"):
-        gpu_names = ", ".join(set(gpu_info["names"]))
-        total_vram = sum(gpu_info["memory_gb"])
-        header += f"""- GPUs: {gpu_info['count']}x {gpu_names}
-- GPU Memory: {total_vram:.1f} GB total
-- CUDA Version: {gpu_info['cuda_version']}
+    if npu_info.get("available"):
+        npu_names = ", ".join(set(npu_info["names"]))
+        total_vram = sum(npu_info["memory_gb"])
+        header += f"""- NPUs: {npu_info['count']}x {npu_names}
+- NPU Memory: {total_vram:.1f} GB total
 """
     else:
-        header += "- GPUs: None available\n"
+        header += "- NPUs: None available\n"
 
     if cost_info and cost_info["hourly_rate"] > 0:
         header += f"""- Hourly Rate: ${cost_info['hourly_rate']:.2f}/hour\n"""

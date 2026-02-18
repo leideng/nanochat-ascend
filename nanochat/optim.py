@@ -1,7 +1,7 @@
 """
 A nice and efficient mixed AdamW/Muon Combined Optimizer.
 Usually the embeddings and scalars go into AdamW, and the matrix parameters go into Muon.
-Two versions are provided (MuonAdamW, DistMuonAdamW), for single GPU and distributed.
+Two versions are provided (MuonAdamW, DistMuonAdamW), for single device and distributed.
 
 Addapted from: https://github.com/KellerJordan/modded-nanogpt
 Further contributions from @karpathy and @chrisjmccormick.
@@ -146,12 +146,12 @@ def muon_step_fused(
     stacked_params.sub_(lr * g + lr * wd * stacked_params * mask)
 
 # -----------------------------------------------------------------------------
-# Single GPU version of the MuonAdamW optimizer.
+# Single device version of the MuonAdamW optimizer.
 # Used mostly for reference, debugging and testing.
 
 class MuonAdamW(torch.optim.Optimizer):
     """
-    Combined optimizer: Muon for 2D matrix params, AdamW for others, single GPU version.
+    Combined optimizer: Muon for 2D matrix params, AdamW for others, single device version.
 
     AdamW - Fused AdamW optimizer step.
 
@@ -161,7 +161,7 @@ class MuonAdamW(torch.optim.Optimizer):
     Muon internally runs standard SGD-momentum, and then performs an orthogonalization post-
     processing step, in which each 2D parameter's update is replaced with the nearest orthogonal
     matrix. To efficiently orthogonalize each update, we use a Newton-Schulz iteration, which has
-    the advantage that it can be stably run in bfloat16 on the GPU.
+    the advantage that it can be stably run in bfloat16 on the device.
 
     Some warnings:
     - The Muon optimizer should not be used for the embedding layer, the final fully connected layer,
@@ -299,7 +299,7 @@ class DistMuonAdamW(torch.optim.Optimizer):
     Combined distributed optimizer: Muon for 2D matrix params, AdamW for others.
 
     See MuonAdamW for the algorithmic details of each optimizer. This class adds
-    distributed communication to enable multi-GPU training without PyTorch DDP.
+    distributed communication to enable multi-device training without PyTorch DDP.
 
     Design Goals:
     - Overlap communication with computation (async ops)

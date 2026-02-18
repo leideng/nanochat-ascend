@@ -2,16 +2,16 @@
 """
 Unified web chat server - serves both UI and API from a single FastAPI instance.
 
-Uses data parallelism to distribute requests across multiple GPUs. Each GPU loads
+Uses data parallelism to distribute requests across multiple NPUs. Each NPU loads
 a full copy of the model, and incoming requests are distributed to available workers.
 
 Launch examples:
 
-- single available GPU (default)
+- single available NPU (default)
 python -m scripts.chat_web
 
-- 4 GPUs
-python -m scripts.chat_web --num-gpus 4
+- 4 NPUs
+python -m scripts.chat_web --num-devices 4
 
 To chat, open the URL printed in the console. (If on cloud box, make sure to use public IP)
 
@@ -19,7 +19,7 @@ Endpoints:
   GET  /           - Chat UI
   POST /chat/completions - Chat API (streaming only)
   GET  /health     - Health check with worker pool status
-  GET  /stats      - Worker pool statistics and GPU utilization
+  GET  /stats      - Worker pool statistics and NPU utilization
 
 Abuse Prevention:
   - Maximum 500 messages per request
@@ -44,7 +44,6 @@ from fastapi.responses import StreamingResponse, HTMLResponse, FileResponse
 from pydantic import BaseModel
 from typing import List, Optional, AsyncGenerator
 from dataclasses import dataclass
-from contextlib import nullcontext
 from nanochat.common import compute_init, autodetect_device_type
 from nanochat.checkpoint_manager import load_model
 from nanochat.engine import Engine
@@ -61,7 +60,7 @@ MIN_MAX_TOKENS = 1
 MAX_MAX_TOKENS = 4096
 
 parser = argparse.ArgumentParser(description='NanoChat Web Server')
-parser.add_argument('-n', '--num-gpus', type=int, default=1, help='Number of GPUs to use (default: 1)')
+parser.add_argument('-n', '--num-devices', type=int, default=1, help='Number of NPUs to use (default: 1)')
 parser.add_argument('-i', '--source', type=str, default="sft", help="Source of the model: sft|rl")
 parser.add_argument('-t', '--temperature', type=float, default=0.8, help='Default temperature for generation')
 parser.add_argument('-k', '--top-k', type=int, default=50, help='Default top-k sampling parameter')
@@ -70,7 +69,7 @@ parser.add_argument('-g', '--model-tag', type=str, default=None, help='Model tag
 parser.add_argument('-s', '--step', type=int, default=None, help='Step to load')
 parser.add_argument('-p', '--port', type=int, default=8000, help='Port to run the server on')
 parser.add_argument('-d', '--dtype', type=str, default='bfloat16', choices=['float32', 'bfloat16'])
-parser.add_argument('--device-type', type=str, default='', choices=['cuda', 'cpu', 'mps'], help='Device type for evaluation: cuda|cpu|mps. empty => autodetect')
+parser.add_argument('--device-type', type=str, default='', choices=['npu', 'cpu'], help='Device type for evaluation: npu|cpu. empty => autodetect')
 parser.add_argument('--host', type=str, default='0.0.0.0', help='Host to bind the server to')
 args = parser.parse_args()
 
@@ -84,60 +83,56 @@ logger = logging.getLogger(__name__)
 
 device_type = autodetect_device_type() if args.device_type == "" else args.device_type
 ddp, ddp_rank, ddp_local_rank, ddp_world_size, device = compute_init(device_type)
-ptdtype = torch.float32 if args.dtype == 'float32' else torch.bfloat16
 
 @dataclass
 class Worker:
-    """A worker with a model loaded on a specific GPU."""
-    gpu_id: int
+    """A worker with a model loaded on a specific NPU."""
+    device_id: int
     device: torch.device
     engine: Engine
     tokenizer: object
-    autocast_ctx: torch.amp.autocast
 
 class WorkerPool:
-    """Pool of workers, each with a model replica on a different GPU."""
+    """Pool of workers, each with a model replica on a different NPU."""
 
-    def __init__(self, num_gpus: Optional[int] = None):
-        if num_gpus is None:
-            if device_type == "cuda":
-                num_gpus = torch.cuda.device_count()
+    def __init__(self, num_devices: Optional[int] = None):
+        if num_devices is None:
+            if device_type == "npu":
+                num_devices = torch.npu.device_count()
             else:
-                num_gpus = 1 # e.g. cpu|mps
-        self.num_gpus = num_gpus
+                num_devices = 1 # e.g. cpu
+        self.num_devices = num_devices
         self.workers: List[Worker] = []
         self.available_workers: asyncio.Queue = asyncio.Queue()
 
     async def initialize(self, source: str, model_tag: Optional[str] = None, step: Optional[int] = None):
-        """Load model on each GPU."""
-        print(f"Initializing worker pool with {self.num_gpus} GPUs...")
-        if self.num_gpus > 1:
-            assert device_type == "cuda", "Only CUDA supports multiple workers/GPUs. cpu|mps does not."
+        """Load model on each NPU."""
+        print(f"Initializing worker pool with {self.num_devices} NPUs...")
+        if self.num_devices > 1:
+            assert device_type == "npu", "Only NPU supports multiple workers. CPU does not."
 
-        for gpu_id in range(self.num_gpus):
+        for device_id in range(self.num_devices):
 
-            if device_type == "cuda":
-                device = torch.device(f"cuda:{gpu_id}")
-                print(f"Loading model on GPU {gpu_id}...")
+            if device_type == "npu":
+                device = torch.device(f"npu:{device_id}")
+                print(f"Loading model on NPU {device_id}...")
             else:
-                device = torch.device(device_type) # e.g. cpu|mps
+                device = torch.device(device_type) # e.g. cpu
                 print(f"Loading model on {device_type}...")
 
             model, tokenizer, _ = load_model(source, device, phase="eval", model_tag=model_tag, step=step)
             engine = Engine(model, tokenizer)
-            autocast_ctx = torch.amp.autocast(device_type=device_type, dtype=ptdtype) if device_type == "cuda" else nullcontext()
 
             worker = Worker(
-                gpu_id=gpu_id,
+                device_id=device_id,
                 device=device,
                 engine=engine,
                 tokenizer=tokenizer,
-                autocast_ctx=autocast_ctx
             )
             self.workers.append(worker)
             await self.available_workers.put(worker)
 
-        print(f"All {self.num_gpus} workers initialized!")
+        print(f"All {self.num_devices} workers initialized!")
 
     async def acquire_worker(self) -> Worker:
         """Get an available worker from the pool."""
@@ -222,9 +217,9 @@ def validate_chat_request(request: ChatRequest):
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    """Load models on all GPUs on startup."""
-    print("Loading nanochat models across GPUs...")
-    app.state.worker_pool = WorkerPool(num_gpus=args.num_gpus)
+    """Load models on all NPUs on startup."""
+    print("Loading nanochat models across NPUs...")
+    app.state.worker_pool = WorkerPool(num_devices=args.num_devices)
     await app.state.worker_pool.initialize(args.source, model_tag=args.model_tag, step=args.step)
     print(f"Server ready at http://localhost:{args.port}")
     yield
@@ -279,40 +274,39 @@ async def generate_stream(
     # Track the last complete UTF-8 string (without replacement characters)
     last_clean_text = ""
 
-    with worker.autocast_ctx:
-        for token_column, token_masks in worker.engine.generate(
-            tokens,
-            num_samples=1,
-            max_tokens=max_new_tokens,
-            temperature=temperature,
-            top_k=top_k,
-            seed=random.randint(0, 2**31 - 1)
-        ):
-            token = token_column[0]
+    for token_column, token_masks in worker.engine.generate(
+        tokens,
+        num_samples=1,
+        max_tokens=max_new_tokens,
+        temperature=temperature,
+        top_k=top_k,
+        seed=random.randint(0, 2**31 - 1)
+    ):
+        token = token_column[0]
 
-            # Stopping criteria
-            if token == assistant_end or token == bos:
-                break
+        # Stopping criteria
+        if token == assistant_end or token == bos:
+            break
 
-            # Append the token to sequence
-            accumulated_tokens.append(token)
-            # Decode all accumulated tokens to get proper UTF-8 handling
-            # Note that decode is a quite efficient operation, basically table lookup and string concat
-            current_text = worker.tokenizer.decode(accumulated_tokens)
-            # Only emit text if it doesn't end with a replacement character
-            # This ensures we don't emit incomplete UTF-8 sequences
-            if not current_text.endswith('�'):
-                # Extract only the new text since last clean decode
-                new_text = current_text[len(last_clean_text):]
-                if new_text:  # Only yield if there's new content
-                    yield f"data: {json.dumps({'token': new_text, 'gpu': worker.gpu_id}, ensure_ascii=False)}\n\n"
-                    last_clean_text = current_text
+        # Append the token to sequence
+        accumulated_tokens.append(token)
+        # Decode all accumulated tokens to get proper UTF-8 handling
+        # Note that decode is a quite efficient operation, basically table lookup and string concat
+        current_text = worker.tokenizer.decode(accumulated_tokens)
+        # Only emit text if it doesn't end with a replacement character
+        # This ensures we don't emit incomplete UTF-8 sequences
+        if not current_text.endswith('�'):
+            # Extract only the new text since last clean decode
+            new_text = current_text[len(last_clean_text):]
+            if new_text:  # Only yield if there's new content
+                yield f"data: {json.dumps({'token': new_text, 'npu': worker.device_id}, ensure_ascii=False)}\n\n"
+                last_clean_text = current_text
 
     yield f"data: {json.dumps({'done': True})}\n\n"
 
 @app.post("/chat/completions")
 async def chat_completions(request: ChatRequest):
-    """Chat completion endpoint (streaming only) - uses worker pool for multi-GPU."""
+    """Chat completion endpoint (streaming only) - uses worker pool for multi-NPU."""
 
     # Basic validation to prevent abuse
     validate_chat_request(request)
@@ -367,7 +361,7 @@ async def chat_completions(request: ChatRequest):
             finally:
                 # Log the assistant response to console
                 full_response = "".join(response_tokens)
-                logger.info(f"[ASSISTANT] (GPU {worker.gpu_id}): {full_response}")
+                logger.info(f"[ASSISTANT] (NPU {worker.device_id}): {full_response}")
                 logger.info("="*20)
                 # Release worker back to pool after streaming is done
                 await worker_pool.release_worker(worker)
@@ -388,7 +382,7 @@ async def health():
     return {
         "status": "ok",
         "ready": worker_pool is not None and len(worker_pool.workers) > 0,
-        "num_gpus": worker_pool.num_gpus if worker_pool else 0,
+        "num_devices": worker_pool.num_devices if worker_pool else 0,
         "available_workers": worker_pool.available_workers.qsize() if worker_pool else 0
     }
 
@@ -402,7 +396,7 @@ async def stats():
         "busy_workers": len(worker_pool.workers) - worker_pool.available_workers.qsize(),
         "workers": [
             {
-                "gpu_id": w.gpu_id,
+                "device_id": w.device_id,
                 "device": str(w.device)
             } for w in worker_pool.workers
         ]

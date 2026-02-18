@@ -7,7 +7,7 @@ or distributed as:
 
 torchrun --nproc_per_node=8 -m scripts.base_train
 
-If you are only on CPU/Macbook, you'll want to train a much much smaller LLM. Example:
+If you are only on CPU, you'll want to train a much much smaller LLM. Example:
 python -m scripts.base_train --depth=4 --max-seq-len=512 --device-batch-size=1 --eval-tokens=512 --core-metric-every=-1 --total-batch-size=512 --num-iterations=20
 """
 
@@ -19,8 +19,6 @@ import time
 import math
 import argparse
 from dataclasses import asdict
-from contextlib import nullcontext
-
 import wandb
 import torch
 
@@ -41,7 +39,7 @@ parser = argparse.ArgumentParser(description="Pretrain base model")
 # Logging
 parser.add_argument("--run", type=str, default="dummy", help="wandb run name ('dummy' disables wandb logging)")
 # Runtime
-parser.add_argument("--device-type", type=str, default="", help="cuda|cpu|mps (empty = autodetect)")
+parser.add_argument("--device-type", type=str, default="", help="npu|cpu (empty = autodetect)")
 # Model architecture
 parser.add_argument("--depth", type=int, default=20, help="depth of the Transformer model")
 parser.add_argument("--aspect-ratio", type=int, default=64, help="model_dim = depth * aspect_ratio")
@@ -83,15 +81,14 @@ user_config = vars(args).copy()  # for logging
 device_type = autodetect_device_type() if args.device_type == "" else args.device_type
 ddp, ddp_rank, ddp_local_rank, ddp_world_size, device = compute_init(device_type)
 master_process = ddp_rank == 0 # this process will do logging, checkpointing etc.
-autocast_ctx = torch.amp.autocast(device_type=device_type, dtype=torch.bfloat16) if device_type == "cuda" else nullcontext()
-synchronize = torch.cuda.synchronize if device_type == "cuda" else lambda: None
-get_max_memory = torch.cuda.max_memory_allocated if device_type == "cuda" else lambda: 0
-if device_type == "cuda":
-    gpu_device_name = torch.cuda.get_device_name(0)
-    gpu_peak_flops = get_peak_flops(gpu_device_name)
-    print0(f"GPU: {gpu_device_name} | Peak FLOPS (BF16): {gpu_peak_flops:.2e}")
+synchronize = torch.npu.synchronize if device_type == "npu" else lambda: None
+get_max_memory = torch.npu.max_memory_allocated if device_type == "npu" else lambda: 0
+if device_type == "npu":
+    npu_device_name = torch.npu.get_device_name(0)
+    npu_peak_flops = get_peak_flops(npu_device_name)
+    print0(f"NPU: {npu_device_name} | Peak FLOPS (BF16): {npu_peak_flops:.2e}")
 else:
-    gpu_peak_flops = float('inf')  # MFU not meaningful for CPU/MPS
+    npu_peak_flops = float('inf')  # MFU not meaningful for CPU
 
 # wandb logging init
 use_dummy_wandb = args.run == "dummy" or not master_process
@@ -99,13 +96,13 @@ wandb_run = DummyWandb() if use_dummy_wandb else wandb.init(project="nanochat", 
 
 # Flash Attention status
 if HAS_FA3:
-    print0("✓ Using Flash Attention 3 (Hopper GPU detected), efficient, new and awesome.")
+    print0("✓ Using Flash Attention 3, efficient, new and awesome.")
 else:
     print0("!" * 80)
     print0("WARNING: Flash Attention 3 not available, using PyTorch SDPA fallback")
     print0("WARNING: Training will be less efficient without FA3")
     if args.window_pattern != "L":
-        print0(f"WARNING: SDPA has no support for sliding window attention (window_pattern='{args.window_pattern}'). Your GPU utilization will be terrible.")
+        print0(f"WARNING: SDPA has no support for sliding window attention (window_pattern='{args.window_pattern}'). Your NPU utilization will be terrible.")
         print0("WARNING: Recommend using --window-pattern L for full context attention without alternating sliding window patterns.")
     print0("!" * 80)
 
@@ -325,8 +322,7 @@ while True:
         model.eval()
         val_loader = build_val_loader()
         eval_steps = args.eval_tokens // (args.device_batch_size * args.max_seq_len * ddp_world_size)
-        with autocast_ctx:
-            val_bpb = evaluate_bpb(model, val_loader, eval_steps, token_bytes)
+        val_bpb = evaluate_bpb(model, val_loader, eval_steps, token_bytes)
         print0(f"Step {step:05d} | Validation bpb: {val_bpb:.6f}")
         if val_bpb < min_val_bpb:
             min_val_bpb = val_bpb
@@ -343,8 +339,7 @@ while True:
     results = {}
     if args.core_metric_every > 0 and (last_step or (step > 0 and step % args.core_metric_every == 0)):
         model.eval()
-        with autocast_ctx:
-            results = evaluate_core(orig_model, tokenizer, device, max_per_task=args.core_metric_max_per_task)
+        results = evaluate_core(orig_model, tokenizer, device, max_per_task=args.core_metric_max_per_task)
         print0(f"Step {step:05d} | CORE metric: {results['core_metric']:.4f}")
         wandb_run.log({
             "step": step,
@@ -370,8 +365,7 @@ while True:
         engine = Engine(orig_model, tokenizer) # use orig_model to avoid recompilation
         for prompt in prompts:
             tokens = tokenizer(prompt, prepend="<|bos|>")
-            with autocast_ctx:
-                sample, _ = engine.generate_batch(tokens, num_samples=1, max_tokens=16, temperature=0)
+            sample, _ = engine.generate_batch(tokens, num_samples=1, max_tokens=16, temperature=0)
             print0(tokenizer.decode(sample[0]))
         model.train()
 
@@ -409,12 +403,11 @@ while True:
     synchronize()
     t0 = time.time()
     for micro_step in range(grad_accum_steps):
-        with autocast_ctx:
-            loss = model(x, y)
+        loss = model(x, y)
         train_loss = loss.detach() # for logging
         loss = loss / grad_accum_steps # each .backward() is a grad sum => normalize loss here
         loss.backward()
-        x, y, dataloader_state_dict = next(train_loader) # prefetch the next batch while the GPU is busy with forward/backward
+        x, y, dataloader_state_dict = next(train_loader) # prefetch the next batch while the NPU is busy with forward/backward
     # step the optimizer
     lrm = get_lr_multiplier(step)
     muon_momentum = get_muon_momentum(step)
@@ -426,7 +419,7 @@ while True:
             group["weight_decay"] = muon_weight_decay
     optimizer.step()
     model.zero_grad(set_to_none=True)
-    train_loss_f = train_loss.item() # .item() is a CPU-GPU sync point
+    train_loss_f = train_loss.item() # .item() is a CPU-NPU sync point
     synchronize()
     t1 = time.time()
     dt = t1 - t0
@@ -439,7 +432,7 @@ while True:
     pct_done = 100 * step / num_iterations
     tok_per_sec = int(total_batch_size / dt)
     flops_per_sec = num_flops_per_token * total_batch_size / dt
-    mfu = 100 * flops_per_sec / (gpu_peak_flops * ddp_world_size)
+    mfu = 100 * flops_per_sec / (npu_peak_flops * ddp_world_size)
     if step > 10:
         total_training_time += dt # only count the time after the first 10 steps
     # Calculate ETA based on average time per step (excluding first 10 steps)

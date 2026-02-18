@@ -15,7 +15,6 @@ os.environ["PYTORCH_ALLOC_CONF"] = "expandable_segments:True"
 import time
 import wandb
 import torch
-from contextlib import nullcontext
 from nanochat.common import compute_init, compute_cleanup, print0, DummyWandb, get_base_dir, autodetect_device_type
 from nanochat.tokenizer import get_token_bytes
 from nanochat.checkpoint_manager import save_checkpoint
@@ -36,8 +35,7 @@ parser = argparse.ArgumentParser(description="Supervised fine-tuning (SFT) the m
 # Logging
 parser.add_argument("--run", type=str, default="dummy", help="wandb run name ('dummy' disables wandb logging)")
 # Runtime
-parser.add_argument("--device-type", type=str, default="", help="cuda|cpu|mps (empty = autodetect)")
-parser.add_argument("--dtype", type=str, default="bfloat16", help="float32|bfloat16")
+parser.add_argument("--device-type", type=str, default="", help="npu|cpu (empty = autodetect)")
 # Model loading
 parser.add_argument("--model-tag", type=str, default=None, help="model tag to load from")
 parser.add_argument("--model-step", type=int, default=None, help="model step to load from")
@@ -66,10 +64,8 @@ user_config = vars(args).copy()
 device_type = autodetect_device_type() if args.device_type == "" else args.device_type
 ddp, ddp_rank, ddp_local_rank, ddp_world_size, device = compute_init(device_type)
 master_process = ddp_rank == 0
-ptdtype = torch.float32 if args.dtype == 'float32' else torch.bfloat16
-autocast_ctx = torch.amp.autocast(device_type=device_type, dtype=ptdtype) if device_type == "cuda" else nullcontext()
-synchronize = torch.cuda.synchronize if device_type == "cuda" else lambda: None
-get_max_memory = torch.cuda.max_memory_allocated if device_type == "cuda" else lambda: 0
+synchronize = torch.npu.synchronize if device_type == "npu" else lambda: None
+get_max_memory = torch.npu.max_memory_allocated if device_type == "npu" else lambda: 0
 
 # wandb logging init
 use_dummy_wandb = args.run == "dummy" or not master_process
@@ -219,10 +215,10 @@ def sft_data_generator_bos_bestfit(split, buffer_size=100):
                 last_step = True
 
         # Build tensors
-        use_cuda = device_type == "cuda"
-        batch_tensor = torch.tensor(rows, dtype=torch.long, pin_memory=use_cuda)
-        inputs = batch_tensor[:, :-1].to(device=device, dtype=torch.int32, non_blocking=use_cuda)
-        targets = batch_tensor[:, 1:].to(device=device, dtype=torch.int64, non_blocking=use_cuda)
+        use_npu = device_type == "npu"
+        batch_tensor = torch.tensor(rows, dtype=torch.long, pin_memory=use_npu)
+        inputs = batch_tensor[:, :-1].to(device=device, dtype=torch.int32, non_blocking=use_npu)
+        targets = batch_tensor[:, 1:].to(device=device, dtype=torch.int64, non_blocking=use_npu)
 
         # Mask out padding positions in targets (set to -1 = ignore_index)
         # For each row, positions >= (content_length - 1) in targets should be masked
@@ -269,8 +265,7 @@ while True:
         model.eval()
         val_loader = build_val_loader()
         eval_steps = args.eval_tokens // (args.device_batch_size * args.max_seq_len * ddp_world_size)
-        with autocast_ctx:
-            val_bpb = evaluate_bpb(model, val_loader, eval_steps, token_bytes)
+        val_bpb = evaluate_bpb(model, val_loader, eval_steps, token_bytes)
         print0(f"Step {step:05d} | Validation bpb: {val_bpb:.4f}")
         if val_bpb < min_val_bpb:
             min_val_bpb = val_bpb
@@ -316,12 +311,11 @@ while True:
     synchronize()
     t0 = time.time()
     for micro_step in range(grad_accum_steps):
-        with autocast_ctx:
-            loss = model(x, y)
+        loss = model(x, y)
         train_loss = loss.detach() # for logging
         loss = loss / grad_accum_steps # each .backward() is a grad sum => normalize loss here
         loss.backward()
-        x, y = next(train_loader) # prefetch the next batch while the GPU is busy with forward/backward
+        x, y = next(train_loader) # prefetch the next batch while the NPU is busy with forward/backward
         progress = max(progress, approx_progress) # only increase progress monotonically
     # step the optimizer
     lrm = get_lr_multiplier(progress)

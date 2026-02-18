@@ -10,7 +10,6 @@ torchrun --nproc_per_node=8 -m scripts.chat_eval -- -a ARC-Easy
 
 import argparse
 from functools import partial
-from contextlib import nullcontext
 
 import torch
 import torch.distributed as dist
@@ -194,13 +193,11 @@ if __name__ == "__main__":
     parser.add_argument('-g', '--model-tag', type=str, default=None, help='Model tag to load')
     parser.add_argument('-s', '--step', type=int, default=None, help='Step to load')
     parser.add_argument('-x', '--max-problems', type=int, default=None, help='Max problems to evaluate')
-    parser.add_argument('--device-type', type=str, default='', choices=['cuda', 'cpu', 'mps'], help='Device type for evaluation: cuda|cpu|mps. empty => autodetect')
+    parser.add_argument('--device-type', type=str, default='', choices=['npu', 'cpu'], help='Device type for evaluation: npu|cpu. empty => autodetect')
     args = parser.parse_args()
 
     device_type = autodetect_device_type() if args.device_type == "" else args.device_type
     ddp, ddp_rank, ddp_local_rank, ddp_world_size, device = compute_init(device_type)
-    ptdtype = torch.float32 if args.dtype == 'float32' else torch.bfloat16
-    autocast_ctx = torch.amp.autocast(device_type=device_type, dtype=ptdtype) if device_type == "cuda" else nullcontext()
 
     model, tokenizer, meta = load_model(args.source, device, phase="eval", model_tag=args.model_tag, step=args.step)
     engine = Engine(model, tokenizer)
@@ -220,19 +217,18 @@ if __name__ == "__main__":
     # Run all the task evaluations sequentially
     results = {}
     for task_name in task_names:
-        with autocast_ctx:
-            acc = run_chat_eval(
-                task_name,
-                model, tokenizer, engine,
-                batch_size=args.batch_size,
-                num_samples=args.num_samples,
-                max_new_tokens=args.max_new_tokens,
-                temperature=args.temperature,
-                top_k=args.top_k,
-                max_problems=args.max_problems,
-            )
-            results[task_name] = acc
-            print0(f"{task_name} accuracy: {100 * acc:.2f}%")
+        acc = run_chat_eval(
+            task_name,
+            model, tokenizer, engine,
+            batch_size=args.batch_size,
+            num_samples=args.num_samples,
+            max_new_tokens=args.max_new_tokens,
+            temperature=args.temperature,
+            top_k=args.top_k,
+            max_problems=args.max_problems,
+        )
+        results[task_name] = acc
+        print0(f"{task_name} accuracy: {100 * acc:.2f}%")
 
     # Log to report
     from nanochat.report import get_report
