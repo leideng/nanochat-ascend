@@ -19,6 +19,8 @@ dependencies = [
 [project.optional-dependencies]
 cpu = []
 npu = [
+    "attrs>=25.4.0",
+    "scipy>=1.17.0",
     "torch-npu==2.9.0",
 ]
 
