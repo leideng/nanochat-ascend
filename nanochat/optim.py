@@ -60,9 +60,12 @@ def adamw_step_fused(
     """
     # Weight decay (decoupled, applied before the update)
     p.mul_(1 - lr_t * wd_t)
-    # Update running averages (lerp_ is cleaner and fuses well)
-    exp_avg.lerp_(grad, 1 - beta1_t)
-    exp_avg_sq.lerp_(grad.square(), 1 - beta2_t)
+    # Update running averages (lerp_ is cleaner and fuses well).
+    # NPU aclnnInplaceLerp requires all operands in the same dtype (e.g. bfloat16); cast to buffer dtype.
+    buf_dtype = exp_avg.dtype
+    grad_t = grad.to(buf_dtype)
+    exp_avg.lerp_(grad_t, (1 - beta1_t).to(buf_dtype))
+    exp_avg_sq.lerp_(grad_t.square(), (1 - beta2_t).to(buf_dtype))
     # Bias corrections
     bias1 = 1 - beta1_t ** step_t
     bias2 = 1 - beta2_t ** step_t
@@ -155,7 +158,8 @@ def muon_step_fused(
     red_dim_size = g.size(red_dim)
     v_norm_sq = v_mean.sum(dim=(-2, -1), keepdim=True) * red_dim_size
     v_norm = v_norm_sq.sqrt()
-    second_momentum_buffer.lerp_(v_mean.to(dtype=second_momentum_buffer.dtype), 1 - beta2)
+    # NPU aclnnInplaceLerp for this buffer expects weight in float32; use beta2_t (float32) not beta2 (g.dtype).
+    second_momentum_buffer.lerp_(v_mean.to(dtype=second_momentum_buffer.dtype), 1 - beta2_t)
     step_size = second_momentum_buffer.clamp_min(1e-10).rsqrt()
     scaled_sq_sum = (v_mean * red_dim_size) * step_size.float().square()
     v_norm_new = scaled_sq_sum.sum(dim=(-2, -1), keepdim=True).sqrt()
