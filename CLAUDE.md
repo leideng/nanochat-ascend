@@ -77,6 +77,7 @@ The codebase has two layers: **nanochat/** (core library) and **scripts/** (entr
 
 - `NANOCHAT_BASE_DIR` — Cache/checkpoint directory (default: `~/.cache/nanochat`)
 - `NANOCHAT_BASE_DATA_DIR` — Path to parquet dataset files (e.g. fineweb-edu-100b-shuffle)
+- `NANOCHAT_ENFORCE_EAGER` — Set to `"1"` to disable torch.compile (run in eager mode)
 - `WANDB_RUN` — W&B run name
 
 ## Key Design Patterns

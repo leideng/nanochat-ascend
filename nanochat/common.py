@@ -68,6 +68,10 @@ def get_base_data_dir():
     os.makedirs(base_data_dir, exist_ok=True)
     return base_data_dir
 
+def enforce_eager():
+    """Check if torch.compile should be disabled (eager mode only)."""
+    return os.environ.get("NANOCHAT_ENFORCE_EAGER", "") == "1"
+
 def print0(s="",**kwargs):
     ddp_rank = int(os.environ.get('RANK', 0))
     if ddp_rank == 0:

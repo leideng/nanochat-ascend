@@ -11,8 +11,12 @@ import torch
 import torch.distributed as dist
 from torch import Tensor
 
-# On Ascend NPU, use torchair backend for torch.compile instead of inductor (which requires triton).
+# torch.compile decorator: respects NANOCHAT_ENFORCE_EAGER env var,
+# uses torchair backend on Ascend NPU, and inductor elsewhere.
 def _get_compile_decorator(**kwargs):
+    import os
+    if os.environ.get("NANOCHAT_ENFORCE_EAGER", "") == "1":
+        return lambda fn: fn
     if hasattr(torch, 'npu') and torch.npu.is_available():
         import torchair
         npu_backend = torchair.get_npu_backend(compiler_config=torchair.CompilerConfig())

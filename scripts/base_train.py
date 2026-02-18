@@ -24,7 +24,7 @@ import torch
 
 from nanochat.gpt import GPT, GPTConfig
 from nanochat.dataloader import tokenizing_distributed_data_loader_bos_bestfit, tokenizing_distributed_data_loader_with_state_bos_bestfit
-from nanochat.common import compute_init, compute_cleanup, print0, DummyWandb, print_banner, get_base_dir, autodetect_device_type, get_peak_flops
+from nanochat.common import compute_init, compute_cleanup, print0, DummyWandb, print_banner, get_base_dir, autodetect_device_type, get_peak_flops, enforce_eager
 from nanochat.tokenizer import get_tokenizer, get_token_bytes
 from nanochat.checkpoint_manager import save_checkpoint, load_checkpoint
 from nanochat.loss_eval import evaluate_bpb
@@ -155,7 +155,9 @@ if resuming:
 # Compile the model
 
 orig_model = model # original, uncompiled model, for saving raw model state_dict and for inference/evaluation (because the shapes may change shape)
-if device_type == "npu":
+if enforce_eager():
+    print0("torch.compile disabled (NANOCHAT_ENFORCE_EAGER=1)")
+elif device_type == "npu":
     import torchair
     npu_backend = torchair.get_npu_backend(compiler_config=torchair.CompilerConfig())
     model = torch.compile(model, backend=npu_backend, dynamic=False)
