@@ -1,12 +1,15 @@
 servers:
   local:
     device: cpu
-    NANOCHAT_BASE_DATA_DIR: /home/leo/dataset/fineweb-edu-100b-shuffle
+    NANOCHAT_BASE_DATA_DIR: /home/leo/dataset/fineweb-edu-100b-shuffle-sample # sample for fast testing
+    #NANOCHAT_BASE_DATA_DIR: /home/leo/dataset/fineweb-edu-100b-shuffle # full dataset
 
   a2:
     device: 910B
-    NANOCHAT_BASE_DATA_DIR: /docker/ldeng/dataset/fineweb-edu-100b-shuffle
+    NANOCHAT_BASE_DATA_DIR: /docker/ldeng/dataset/fineweb-edu-100b-shuffle-sample # sample for fast testing
+    #NANOCHAT_BASE_DATA_DIR: /docker/ldeng/dataset/fineweb-edu-100b-shuffle # full dataset
 
   a3:
     device: 910C
-    NANOCHAT_BASE_DATA_DIR: /data/ldeng/dataset/fineweb-edu-100b-shuffle
+    NANOCHAT_BASE_DATA_DIR: /data/ldeng/dataset/fineweb-edu-100b-shuffle-sample # sample for fast testing
+    #NANOCHAT_BASE_DATA_DIR: /data/ldeng/dataset/fineweb-edu-100b-shuffle # full dataset  
