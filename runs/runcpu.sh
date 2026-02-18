@@ -10,6 +10,9 @@
 # Think of this run as educational/fun demo, not something you should expect to work well.
 # You may also want to run this script manually and one by one, copy pasting commands into your terminal.
 
+# exit on error
+set -e
+
 # all the setup stuff
 export NANOCHAT_BASE_DIR=$(yq -r '.servers.local.NANOCHAT_BASE_DIR' configs/servers.yaml)
 mkdir -p $NANOCHAT_BASE_DIR
