@@ -29,7 +29,8 @@ python -m tasks.spellingbee
 import re
 import random
 from tasks.common import Task
-from nanochat.common import download_file_with_lock
+from nanochat.common import get_base_dir
+import os
 
 # Letters of the alphabet
 LETTERS = "abcdefghijklmnopqrstuvwxyz"
@@ -120,7 +121,11 @@ class SpellingBee(Task):
         self.size = size
         self.split = split
         filename = WORD_LIST_URL.split("/")[-1]
-        word_list_path = download_file_with_lock(WORD_LIST_URL, filename)
+        print(f"filename: {filename}")
+        #word_list_path = download_file_with_lock(WORD_LIST_URL, filename)
+        word_list_path = os.path.join(get_base_dir(), filename)
+
+
         with open(word_list_path, 'r', encoding='utf-8') as f:
             words = [line.strip() for line in f]
         self.words = words
@@ -239,7 +244,8 @@ class SimpleSpelling(Task):
         self.size = size
         self.split = split
         filename = WORD_LIST_URL.split("/")[-1]
-        word_list_path = download_file_with_lock(WORD_LIST_URL, filename)
+        #word_list_path = download_file_with_lock(WORD_LIST_URL, filename)
+        word_list_path = os.path.join(get_base_dir(), filename)
         with open(word_list_path, 'r', encoding='utf-8') as f:
             words = [line.strip() for line in f]
         rng = random.Random(42)
