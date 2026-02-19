@@ -312,7 +312,14 @@ else:
 
 # Figure out the needed gradient accumulation micro-steps to reach the desired total batch size per step
 tokens_per_fwdbwd = args.device_batch_size * args.max_seq_len # tokens per iteration for a single rank
+print0(f"device_batch_size: {args.device_batch_size}")
+print0(f"max_seq_len: {args.max_seq_len}")
+print0(f"ddp_world_size: {ddp_world_size}")
+print0(f"tokens_per_fwdbwd: {tokens_per_fwdbwd}")
 world_tokens_per_fwdbwd = tokens_per_fwdbwd * ddp_world_size # total tokens per iteration for all ranks
+print0(f"world_tokens_per_fwdbwd: {world_tokens_per_fwdbwd:,}")
+print0(f"total_batch_size: {total_batch_size}")
+print0(f"total_batch_size // world_tokens_per_fwdbwd: {total_batch_size // world_tokens_per_fwdbwd}")
 assert total_batch_size % world_tokens_per_fwdbwd == 0
 grad_accum_steps = total_batch_size // world_tokens_per_fwdbwd
 print0(f"Tokens / micro-batch / rank: {args.device_batch_size} x {args.max_seq_len} = {tokens_per_fwdbwd:,}")
