@@ -32,7 +32,7 @@ def evaluate_bpb(model, batches, steps, token_bytes):
         x, y = next(batch_iter)
         loss2d = model(x, y, loss_reduction='none') # (B, T)
         loss2d = loss2d.view(-1) # flatten
-        y = y.view(-1) # flatten
+        y = y.reshape(-1) # flatten
         if (y.int() < 0).any(): # use int32 for the comparison
             # slightly more complex code path if some target tokens are ignore_index (e.g. -1)
             # any target token < 0 is to be ignored: do NOT index token_bytes with negatives
