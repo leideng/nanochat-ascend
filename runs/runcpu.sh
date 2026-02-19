@@ -21,6 +21,9 @@ echo "NANOCHAT_BASE_DIR: $NANOCHAT_BASE_DIR"
 export NANOCHAT_BASE_DATA_DIR=$(yq -r '.servers.local.NANOCHAT_BASE_DATA_DIR' configs/servers.yaml)
 echo "NANOCHAT_BASE_DATA_DIR: $NANOCHAT_BASE_DATA_DIR"
 
+export NANOCHAT_ENFORCE_EAGER=$(yq -r '.servers.local.NANOCHAT_ENFORCE_EAGER' configs/servers.yaml)
+echo "NANOCHAT_ENFORCE_EAGER: $NANOCHAT_ENFORCE_EAGER"
+
 command -v uv &> /dev/null || curl -LsSf https://astral.sh/uv/install.sh | sh
 [ -d ".venv" ] || uv venv
 uv sync --extra cpu
@@ -30,13 +33,14 @@ if [ -z "$WANDB_RUN" ]; then
 fi
 
 # train tokenizer on ~2B characters (~34 seconds on my MacBook Pro M3 Max)
-python -m nanochat.dataset 
-python -m scripts.tok_train --max-chars=2000000
-python -m scripts.tok_eval
+#python -m nanochat.dataset 
+#python -m scripts.tok_train --max-chars=2000000
+#python -m scripts.tok_eval
 
 # train a small 4 layer model
 # I tuned this run to complete in about 30 minutes on my MacBook Pro M3 Max.
 # To get better results, try increasing num_iterations, or get other ideas from your favorite LLM.
+<<'COMMENT_BLOCK'
 python -m scripts.base_train \
     --depth=6 \
     --head-dim=64 \
@@ -44,16 +48,17 @@ python -m scripts.base_train \
     --max-seq-len=512 \
     --device-batch-size=32 \
     --total-batch-size=16384 \
-    --eval-every=100 \
+    --eval-every=5 \
     --eval-tokens=524288 \
     --core-metric-every=-1 \
-    --sample-every=100 \
-    --num-iterations=100 \
+    --sample-every=5 \
+    --num-iterations=10 \
     --run=$WANDB_RUN
-python -m scripts.base_eval --device-batch-size=1 --split-tokens=16384 --max-per-task=16
+COMMENT_BLOCK
+#python -m scripts.base_eval --device-batch-size=1 --split-tokens=16384 --max-per-task=16
 
 # SFT (~10 minutes on my MacBook Pro M3 Max)
-curl -L -o $NANOCHAT_BASE_DIR/identity_conversations.jsonl https://karpathy-public.s3.us-west-2.amazonaws.com/identity_conversations.jsonl
+#curl -L -o $NANOCHAT_BASE_DIR/identity_conversations.jsonl https://karpathy-public.s3.us-west-2.amazonaws.com/identity_conversations.jsonl
 python -m scripts.chat_sft \
     --max-seq-len=512 \
     --device-batch-size=32 \
