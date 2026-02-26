@@ -14,14 +14,14 @@
 set -e
 
 # all the setup stuff
-export NANOCHAT_BASE_DIR=$(yq -r '.servers.local.NANOCHAT_BASE_DIR' configs/servers.yaml)
+export NANOCHAT_BASE_DIR=$(yq -r '.NANOCHAT_BASE_DIR' configs/local.yaml)
 mkdir -p $NANOCHAT_BASE_DIR
 echo "NANOCHAT_BASE_DIR: $NANOCHAT_BASE_DIR"
 
-export NANOCHAT_BASE_DATA_DIR=$(yq -r '.servers.local.NANOCHAT_BASE_DATA_DIR' configs/servers.yaml)
+export NANOCHAT_BASE_DATA_DIR=$(yq -r '.NANOCHAT_BASE_DATA_DIR' configs/local.yaml)
 echo "NANOCHAT_BASE_DATA_DIR: $NANOCHAT_BASE_DATA_DIR"
 
-export NANOCHAT_ENFORCE_EAGER=$(yq -r '.servers.local.NANOCHAT_ENFORCE_EAGER' configs/servers.yaml)
+export NANOCHAT_ENFORCE_EAGER=$(yq -r '.NANOCHAT_ENFORCE_EAGER' configs/local.yaml)
 echo "NANOCHAT_ENFORCE_EAGER: $NANOCHAT_ENFORCE_EAGER"
 
 command -v uv &> /dev/null || curl -LsSf https://astral.sh/uv/install.sh | sh

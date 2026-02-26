@@ -1,0 +1,5 @@
+device: 910C
+NANOCHAT_BASE_DIR: /data/ldeng/.cache/nanochat-ascend
+#NANOCHAT_BASE_DATA_DIR: /data/ldeng/dataset/fineweb-edu-100b-shuffle-sample # sample for fast testing
+NANOCHAT_BASE_DATA_DIR: /data/ldeng/dataset/fineweb-edu-100b-shuffle # full dataset
+NANOCHAT_ENFORCE_EAGER: "1" # disable torch.compile (torchair not stable on 910C)
