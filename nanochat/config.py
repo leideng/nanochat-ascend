@@ -15,7 +15,7 @@ class Config:
     eval_dataset: str = ""
     output_dir: str = ""
 
-    def load_config(self, config_path: str):
+    def load_from_yaml(self, config_path: str):
         with open(config_path, 'r') as file:
             try:
                 data = yaml.safe_load(file)
@@ -39,6 +39,6 @@ if __name__ == "__main__":
     config = Config()
     print(f"{'='*50} before loading {'='*50}")
     config.nice_print()
-    config.load_config("configs/local.yaml")
+    config.load_from_yaml("configs/local.yaml")
     print(f"{'='*50} after loading {'='*50}")
     config.nice_print()
