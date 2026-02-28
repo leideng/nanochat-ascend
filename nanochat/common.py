@@ -7,6 +7,7 @@ import re
 import logging
 import torch
 import torch.distributed as dist
+from nanochat.config import Config
 
 class ColoredFormatter(logging.Formatter):
     """Custom formatter that adds colors to log messages."""
@@ -45,32 +46,18 @@ def setup_default_logging():
 setup_default_logging()
 logger = logging.getLogger(__name__)
 
-def get_base_dir():
-    # co-locate nanochat intermediates with other cached data in ~/.cache (by default)
-    if os.environ.get("NANOCHAT_BASE_DIR"):
-        nanochat_dir = os.environ.get("NANOCHAT_BASE_DIR")
-    else:
-        home_dir = os.path.expanduser("~")
-        cache_dir = os.path.join(home_dir, ".cache")
-        nanochat_dir = os.path.join(cache_dir, "nanochat")
-    os.makedirs(nanochat_dir, exist_ok=True)
-    return nanochat_dir
 
-# The base/pretraining dataset is a set of parquet files.
-# You should first download the dataset and saving into a folder
-# and then assign the folder to the environment variable NANOCHAT_BASE_DATA_DIR.
-def get_base_data_dir():
-    if os.environ.get("NANOCHAT_BASE_DATA_DIR"):
-        base_data_dir = os.environ.get("NANOCHAT_BASE_DATA_DIR")
+def get_config():
+    """Get the config from the environment variable NANOCHAT_CONFIG"""
+    if "NANOCHAT_CONFIG" in os.environ:
+        config_path = os.environ.get("NANOCHAT_CONFIG")
+        print(f"Loading config from {config_path}")
+        config = Config()
+        config.load_from_yaml(config_path)
+        return config
     else:
-        base_dir = get_base_dir()
-        base_data_dir = os.path.join(base_dir, "base_data")
-    os.makedirs(base_data_dir, exist_ok=True)
-    return base_data_dir
+        raise ValueError("NANOCHAT_CONFIG environment variable is not set")
 
-def enforce_eager():
-    """Check if torch.compile should be disabled (eager mode only)."""
-    return os.environ.get("NANOCHAT_ENFORCE_EAGER", "") == "1"
 
 def print0(s="",**kwargs):
     ddp_rank = int(os.environ.get('RANK', 0))

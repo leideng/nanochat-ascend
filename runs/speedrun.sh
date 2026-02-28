@@ -23,6 +23,7 @@ echo "NANOCHAT_BASE_DATA_DIR: $NANOCHAT_BASE_DATA_DIR"
 export NANOCHAT_ENFORCE_EAGER=$(yq -r '.NANOCHAT_ENFORCE_EAGER' configs/a3.yaml)
 echo "NANOCHAT_ENFORCE_EAGER: $NANOCHAT_ENFORCE_EAGER"
 
+export NANOCHAT_CONFIG="configs/local.yaml"
 # -----------------------------------------------------------------------------
 # Python venv setup with uv
 

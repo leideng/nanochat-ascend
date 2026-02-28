@@ -8,7 +8,8 @@ For details of how the dataset was prepared, see `repackage_data_reference.py`.
 
 import os
 import pyarrow.parquet as pq
-from nanochat.common import get_base_data_dir
+from nanochat.common import get_config
+from nanochat.config import Config
 
 
 def list_parquet_files(data_dir=None):
@@ -40,7 +41,8 @@ def parquets_iter_batched(split, data_dir=None, start=0, step=1):
 
 # you can run it in the project root directory by running `python -m nanochat.dataset`
 if __name__ == "__main__":
-    base_data_dir = "/home/leo/dataset/fineweb-edu-100b-shuffle-sample"
+    config = get_config()
+    base_data_dir = config.pretrain_dataset
 
     parquet_files = list_parquet_files(base_data_dir)   
     
