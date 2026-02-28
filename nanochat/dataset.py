@@ -1,6 +1,6 @@
 """
 The base/pretraining dataset is a set of parquet files.
-You should first download the dataset and saving into NANOCHAT_BASE_DATA_DIR environment variable.
+You should first download the dataset and saving into config.pretrain_dataset.
 This file contains utilities for iterating over the parquet files and yielding documents from it.
 
 For details of how the dataset was prepared, see `repackage_data_reference.py`.
