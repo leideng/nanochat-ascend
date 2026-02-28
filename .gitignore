@@ -208,7 +208,4 @@ __marimo__/
 
 # GitOps (cloned separately, not tracked)
 leo-gitops/
-# downloaded dataset
-dataset
-# output results
-output
+.cache
