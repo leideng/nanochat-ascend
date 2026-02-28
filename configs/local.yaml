@@ -1,5 +1,6 @@
 device: cpu
-NANOCHAT_BASE_DIR: /home/leo/.cache/nanochat-ascend
-NANOCHAT_BASE_DATA_DIR: /home/leo/dataset/fineweb-edu-100b-shuffle-sample # sample for fast testing
-#NANOCHAT_BASE_DATA_DIR: /home/leo/dataset/fineweb-edu-100b-shuffle # full dataset
-NANOCHAT_ENFORCE_EAGER: "1" # disable torch.compile
+pretrain_dataset: .cache/dataset/pretrain/fineweb-edu-100b-shuffle-sample
+sft_dataset: .cache/dataset/sft/identity_conversations.jsonl #source: https://karpathy-public.s3.us-west-2.amazonaws.com/identity_conversations.jsonl
+eval_dataset: .cache/dataset/eval/core.yaml  #source: https://karpathy-public.s3.us-west-2.amazonaws.com/eval_bundle.zip
+output_dir: .cache/output
+enforce_eager: true # disable torch.compile
