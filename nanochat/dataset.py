@@ -9,12 +9,10 @@ For details of how the dataset was prepared, see `repackage_data_reference.py`.
 import os
 import pyarrow.parquet as pq
 from nanochat.common import get_config
-from nanochat.config import Config
-
 
 def list_parquet_files(data_dir=None):
     """ Looks into a data dir and returns full paths to all parquet files. """
-    data_dir = get_base_data_dir() if data_dir is None else data_dir
+    data_dir = get_config().pretrain_dataset if data_dir is None else data_dir
     parquet_files = sorted([
         f for f in os.listdir(data_dir)
         if f.endswith('.parquet') and not f.endswith('.tmp')
@@ -40,11 +38,8 @@ def parquets_iter_batched(split, data_dir=None, start=0, step=1):
 
 
 # you can run it in the project root directory by running `python -m nanochat.dataset`
-if __name__ == "__main__":
-    config = get_config()
-    base_data_dir = config.pretrain_dataset
-
-    parquet_files = list_parquet_files(base_data_dir)   
+if __name__ == "__main__":    
+    parquet_files = list_parquet_files()
     
     print("="*20 + "Parquet files info" + "="*20)
     print(f"List of parquet files: {parquet_files}")
@@ -65,7 +60,7 @@ if __name__ == "__main__":
 
     print("="*20 + "Iterating through the dataset..." + "="*20)
     idx = 0
-    for texts in parquets_iter_batched(split="train", data_dir=base_data_dir):
+    for texts in parquets_iter_batched(split="train"):
         n_samples = len(texts)
         first_sample = texts[0]
         # print the first sample in a short form with only start and end of the string
