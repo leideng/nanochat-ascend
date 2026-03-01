@@ -16,5 +16,8 @@ fi
 export OMP_NUM_THREADS=1
 export NANOCHAT_CONFIG="configs/local.yaml"
 
+echo "OMP_NUM_THREADS is set to be: $OMP_NUM_THREADS"
 echo "NANOCHAT_CONFI is set to be: $NANOCHAT_CONFIG"
-echo "Please run \"echo \$NANOCHAT_CONFIG\" in your terminal to verify the environment variable is set"
+
+echo "Please run \"echo \$NANOCHAT_CONFIG\" in your terminal to set the NANOCHAT_CONFIG environment variable"
+echo "Please run \"echo \$OMP_NUM_THREADS\" in your terminal to set the OMP_NUM_THREADS environment variable"
