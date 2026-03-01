@@ -57,8 +57,6 @@ if __name__ == "__main__":
     config = Config.load_from_yaml("configs/local.yaml")
     print(f"{'='*50} after loading {'='*50}")
     config.nice_print()
-
-    print(f"config.device: {config.device}")
     
     # frozen=True, so this will raise an error like this
     # "dataclasses.FrozenInstanceError: cannot assign to field 'device'""
