@@ -2,11 +2,11 @@
 Configuration for the nanochat-ascend model.
 """
 
-from dataclasses import dataclass
+from dataclasses import dataclass, fields
 import yaml
 import json
 
-@dataclass
+@dataclass(frozen=True)
 class Config:
     device: str = "cpu"
     enforce_eager: bool = True
@@ -15,30 +15,45 @@ class Config:
     eval_dataset: str = ""
     output_dir: str = ""
 
-    def load_from_yaml(self, config_path: str):
-        with open(config_path, 'r') as file:
-            try:
+    @classmethod
+    def load_from_yaml(cls, config_path: str) -> "Config":
+        """Load config from a YAML file. Returns a new frozen Config instance."""
+        try:
+            with open(config_path, "r") as file:
                 data = yaml.safe_load(file)
-                # yaml config should be exactly the same as the config class
-                for key, value in data.items():
-                    if key not in self.__dict__:
-                        raise ValueError(f"Config key {key} not found in config class")
-                    if type(value) != type(getattr(self, key)):
-                        raise ValueError(f"Config value {value} for key {key} is of type {type(value)} but should be of type {type(getattr(self, key))}")
-                    setattr(self, key, value)
-            except yaml.YAMLError as exc:
-                print(exc)
-    
+        except yaml.YAMLError as exc:
+            raise yaml.YAMLError(f"Invalid YAML in {config_path}") from exc
+        if data is None:
+            data = {}
+        defaults = cls()
+        kwargs = {}
+        for f in fields(cls):
+            key = f.name
+            if key in data:
+                value = data[key]
+                if type(value) != type(getattr(defaults, key)):
+                    raise ValueError(
+                        f"Config value {value} for key {key} is of type {type(value)} "
+                        f"but should be of type {type(getattr(defaults, key))}"
+                    )
+                kwargs[key] = value
+            else:
+                kwargs[key] = getattr(defaults, key)
+        valid_keys = {f.name for f in fields(cls)}
+        for key in data:
+            if key not in valid_keys:
+                raise ValueError(f"Config key {key} not found in config class")
+        return cls(**kwargs)
+
     def nice_print(self):
         print("Config:")
-        print(json.dumps(self.__dict__, indent=2))
+        print(json.dumps({f.name: getattr(self, f.name) for f in fields(self)}, indent=2))
     
 
 
 if __name__ == "__main__":
-    config = Config()
     print(f"{'='*50} before loading {'='*50}")
-    config.nice_print()
-    config.load_from_yaml("configs/local.yaml")
+    Config().nice_print()
+    config = Config.load_from_yaml("configs/local.yaml")
     print(f"{'='*50} after loading {'='*50}")
     config.nice_print()

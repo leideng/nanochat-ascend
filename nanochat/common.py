@@ -52,9 +52,7 @@ def get_config():
     if "NANOCHAT_CONFIG" in os.environ:
         config_path = os.environ.get("NANOCHAT_CONFIG")
         print(f"Loading config from {config_path}")
-        config = Config()
-        config.load_from_yaml(config_path)
-        return config
+        return Config.load_from_yaml(config_path)
     else:
         raise ValueError("NANOCHAT_CONFIG environment variable is not set")
 
