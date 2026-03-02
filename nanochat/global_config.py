@@ -7,17 +7,18 @@ import yaml
 import json
 
 @dataclass(frozen=True)
-class Config:
+class GlobalConfig:
     device: str = "cpu"
     enforce_eager: bool = True
     pretrain_dataset: str = ""
     sft_dataset: str = ""
     eval_dataset: str = ""
     output_dir: str = ""
-
+    base_checkpoints_dir: str = ""
+    
     @classmethod
-    def load_from_yaml(cls, config_path: str) -> "Config":
-        """Load config from a YAML file. Returns a new frozen Config instance."""
+    def load_from_yaml(cls, config_path: str) -> "GlobalConfig":
+        """Load config from a YAML file. Returns a new frozen GlobalConfig instance."""
         try:
             with open(config_path, "r") as file:
                 data = yaml.safe_load(file)
@@ -46,17 +47,17 @@ class Config:
         return cls(**kwargs)
 
     def nice_print(self):
-        print("Config:")
+        print("GlobalConfig:")
         print(json.dumps({f.name: getattr(self, f.name) for f in fields(self)}, indent=2))
     
 
 
 if __name__ == "__main__":
     print(f"{'='*50} before loading {'='*50}")
-    Config().nice_print()
-    config = Config.load_from_yaml("configs/local.yaml")
+    GlobalConfig().nice_print()
+    global_config = GlobalConfig.load_from_yaml("configs/local.yaml")
     print(f"{'='*50} after loading {'='*50}")
-    config.nice_print()
+    global_config.nice_print()
     
     # frozen=True, so this will raise an error like this
     # "dataclasses.FrozenInstanceError: cannot assign to field 'device'""
