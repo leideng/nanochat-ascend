@@ -3,4 +3,5 @@ pretrain_dataset: .cache/dataset/pretrain/fineweb-edu-100b-shuffle-sample
 sft_dataset: .cache/dataset/sft/identity_conversations.jsonl #source: https://karpathy-public.s3.us-west-2.amazonaws.com/identity_conversations.jsonl
 eval_dataset: .cache/dataset/eval/core.yaml  #source: https://karpathy-public.s3.us-west-2.amazonaws.com/eval_bundle.zip
 output_dir: .cache/output
+base_checkpoints_dir: .cache/base_checkpoints
 enforce_eager: true # disable torch.compile

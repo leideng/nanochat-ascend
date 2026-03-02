@@ -7,7 +7,7 @@ import re
 import logging
 import torch
 import torch.distributed as dist
-from nanochat.config import Config
+from nanochat.global_config import GlobalConfig
 
 class ColoredFormatter(logging.Formatter):
     """Custom formatter that adds colors to log messages."""
@@ -47,12 +47,12 @@ setup_default_logging()
 logger = logging.getLogger(__name__)
 
 
-def get_config():
-    """Get the config from the environment variable NANOCHAT_CONFIG"""
+def get_global_config():
+    """Get the global config from the environment variable NANOCHAT_CONFIG"""
     if "NANOCHAT_CONFIG" in os.environ:
         config_path = os.environ.get("NANOCHAT_CONFIG")
-        print(f"Loading config from {config_path}")
-        return Config.load_from_yaml(config_path)
+        print(f"Loading global config from {config_path}")
+        return GlobalConfig.load_from_yaml(config_path)
     else:
         raise ValueError("NANOCHAT_CONFIG environment variable is not set")
 

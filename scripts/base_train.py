@@ -24,7 +24,7 @@ import torch
 
 from nanochat.gpt import GPT, GPTConfig
 from nanochat.dataloader import tokenizing_distributed_data_loader_bos_bestfit, tokenizing_distributed_data_loader_with_state_bos_bestfit
-from nanochat.common import compute_init, compute_cleanup, print0, DummyWandb, print_banner, get_base_dir, autodetect_device_type, get_peak_flops, enforce_eager
+from nanochat.common import compute_init, compute_cleanup, print0, DummyWandb, print_banner, get_global_config, autodetect_device_type, get_peak_flops
 from nanochat.tokenizer import get_tokenizer, get_token_bytes
 from nanochat.checkpoint_manager import save_checkpoint, load_checkpoint
 from nanochat.loss_eval import evaluate_bpb
@@ -92,7 +92,7 @@ else:
 
 # wandb logging init
 use_dummy_wandb = args.run == "dummy" or not master_process
-wandb_run = DummyWandb() if use_dummy_wandb else wandb.init(project="nanochat", name=args.run, config=user_config)
+wandb_run = DummyWandb() if use_dummy_wandb else wandb.init(project="nanochat-ascend", name=args.run, config=user_config)
 
 # Flash Attention status
 if HAS_FA3:
@@ -141,9 +141,12 @@ model.to_empty(device=device) # 2) All tensors get storage on target device but 
 model.init_weights() # 3) All tensors get initialized
 
 # If we are resuming, overwrite the model parameters with those of the checkpoint
-base_dir = get_base_dir()
+global_config = get_global_config()
+checkpoint_dir = global_config.base_checkpoints_dir
 output_dirname = args.model_tag if args.model_tag else f"d{args.depth}" # e.g. d12
-checkpoint_dir = os.path.join(base_dir, "base_checkpoints", output_dirname)
+checkpoint_dir = os.path.join(checkpoint_dir, output_dirname)
+print0(f"Checkpoint directory: {checkpoint_dir}")
+
 resuming = args.resume_from_step != -1
 if resuming:
     print0(f"Resuming optimization from step {args.resume_from_step}")
