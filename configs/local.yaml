@@ -8,4 +8,5 @@ chatsft_checkpoints_dir: .cache/output/chatsft_checkpoints
 chatrl_checkpoints_dir: .cache/output/chatrl_checkpoints
 base_eval_dir: .cache/output/base_eval
 tokenizer_dir: .cache/output/tokenizer
+report_dir: .cache/output/report
 enforce_eager: true # disable torch.compile
