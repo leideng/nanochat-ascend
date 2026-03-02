@@ -15,7 +15,7 @@ os.environ["PYTORCH_ALLOC_CONF"] = "expandable_segments:True"
 import time
 import wandb
 import torch
-from nanochat.common import compute_init, compute_cleanup, print0, DummyWandb, get_base_dir, autodetect_device_type, enforce_eager
+from nanochat.common import compute_init, compute_cleanup, print0, DummyWandb, get_global_config, autodetect_device_type
 from nanochat.tokenizer import get_token_bytes
 from nanochat.checkpoint_manager import save_checkpoint
 from nanochat.loss_eval import evaluate_bpb
@@ -77,7 +77,7 @@ pretrain_batch_size = meta.get("device_batch_size", None)
 if pretrain_batch_size is not None and args.device_batch_size > pretrain_batch_size:
     print0(f"FOOTGUN WARNING: base model training used device_batch_size {pretrain_batch_size}, did you pass in a good --device-batch-size to this script?")
 orig_model = model
-if enforce_eager():
+if get_global_config().enforce_eager:
     print0("torch.compile disabled (NANOCHAT_ENFORCE_EAGER=1)")
 elif device_type == "npu":
     import torchair
@@ -104,8 +104,7 @@ for group in optimizer.param_groups:
     group["initial_lr"] = group["lr"]
 
 # SFT data mixture and DataLoader
-base_dir = get_base_dir()
-identity_conversations_filepath = os.path.join(base_dir, "identity_conversations.jsonl")
+identity_conversations_filepath = get_global_config().sft_dataset
 train_dataset = TaskMixture([
     SmolTalk(split="train"), # 460K rows of general conversations
     MMLU(subset="auxiliary_train", split="train"), # 100K rows of multiple choice problems drawn from ARC, MC_TEST, OBQA, RACE
