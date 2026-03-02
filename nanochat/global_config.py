@@ -12,6 +12,7 @@ class GlobalConfig:
     enforce_eager: bool = True
     pretrain_dataset: str = ""
     sft_dataset: str = ""
+    simple_spelling_dataset: str = ""
     eval_dataset: str = ""
     output_dir: str = ""
     base_checkpoints_dir: str = ""

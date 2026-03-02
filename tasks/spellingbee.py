@@ -29,7 +29,7 @@ python -m tasks.spellingbee
 import re
 import random
 from tasks.common import Task
-from nanochat.common import get_base_dir
+from nanochat.common import get_global_config
 import os
 
 # Letters of the alphabet
@@ -120,10 +120,8 @@ class SpellingBee(Task):
         assert split in ["train", "test"], "SpellingBee split must be train|test"
         self.size = size
         self.split = split
-        filename = WORD_LIST_URL.split("/")[-1]
-        print(f"filename: {filename}")
-        #word_list_path = download_file_with_lock(WORD_LIST_URL, filename)
-        word_list_path = os.path.join(get_base_dir(), filename)
+        word_list_path = get_global_config().simple_spelling_dataset
+        print(f"word_list_path: {word_list_path}")
 
 
         with open(word_list_path, 'r', encoding='utf-8') as f:
@@ -243,9 +241,8 @@ class SimpleSpelling(Task):
         assert split in ["train", "test"], "SpellingBee split must be train|test"
         self.size = size
         self.split = split
-        filename = WORD_LIST_URL.split("/")[-1]
-        #word_list_path = download_file_with_lock(WORD_LIST_URL, filename)
-        word_list_path = os.path.join(get_base_dir(), filename)
+        word_list_path = get_global_config().simple_spelling_dataset
+        print(f"word_list_path: {word_list_path}")
         with open(word_list_path, 'r', encoding='utf-8') as f:
             words = [line.strip() for line in f]
         rng = random.Random(42)
