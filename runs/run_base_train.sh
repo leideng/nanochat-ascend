@@ -5,11 +5,22 @@ echo "NUM_CPU in this machine is: $NUM_CPU"
 
 WANDB_RUN=dummy
 
-# d24 model (slightly overtrained is enough to beat GPT-2 => increase data:params ratio from compute optimal 10.5 (default) to 12)
-torchrun --standalone --nproc_per_node=$NUM_CPU --master-addr=127.0.0.1 -m scripts.base_train -- \
---depth=26 \
---target-param-data-ratio=8.25 \
---device-batch-size=8 \
---eval-every=100 \
---save-every=100 \
---run=$WANDB_RUN \
+# train a small 4 layer model
+# I tuned this run to complete in about 2 minutes on my PC.
+# To get better results, try increasing num_iterations, or get other ideas from your favorite LLM.
+python -m scripts.base_train \
+    --depth=4 \
+    --head-dim=16 \
+    --window-pattern=L \
+    --max-seq-len=128 \
+    --device-batch-size=8 \
+    --total-batch-size=1024 \
+    --eval-every=10 \
+    --eval-tokens=1024 \
+    --core-metric-every=-1 \
+    --sample-every=10 \
+    --save-every=10 \
+    --num-iterations=20 \
+    --run=$WANDB_RUN \
+    --model-tag="d4-test"
+
