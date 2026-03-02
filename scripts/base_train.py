@@ -157,7 +157,7 @@ if resuming:
 # Compile the model
 
 orig_model = model # original, uncompiled model, for saving raw model state_dict and for inference/evaluation (because the shapes may change shape)
-if enforce_eager():
+if get_global_config().enforce_eager:
     print0("torch.compile disabled (NANOCHAT_ENFORCE_EAGER=1)")
 elif device_type == "npu":
     import torchair
