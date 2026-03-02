@@ -141,8 +141,7 @@ model.to_empty(device=device) # 2) All tensors get storage on target device but 
 model.init_weights() # 3) All tensors get initialized
 
 # If we are resuming, overwrite the model parameters with those of the checkpoint
-global_config = get_global_config()
-checkpoint_dir = global_config.base_checkpoints_dir
+checkpoint_dir = get_global_config().base_checkpoints_dir
 output_dirname = args.model_tag if args.model_tag else f"d{args.depth}" # e.g. d12
 checkpoint_dir = os.path.join(checkpoint_dir, output_dirname)
 print0(f"Checkpoint directory: {checkpoint_dir}")

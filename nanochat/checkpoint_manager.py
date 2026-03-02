@@ -8,7 +8,7 @@ import json
 import logging
 import torch
 
-from nanochat.common import get_base_dir
+from nanochat.common import get_global_config   
 from nanochat.gpt import GPT, GPTConfig
 from nanochat.tokenizer import get_tokenizer
 from nanochat.common import setup_default_logging
@@ -162,11 +162,14 @@ def load_model_from_dir(checkpoints_dir, device, phase, model_tag=None, step=Non
     return model, tokenizer, meta_data
 
 def load_model(source, *args, **kwargs):
-    model_dir = {
-        "base": "base_checkpoints",
-        "sft": "chatsft_checkpoints",
-        "rl": "chatrl_checkpoints",
-    }[source]
-    base_dir = get_base_dir()
-    checkpoints_dir = os.path.join(base_dir, model_dir)
+    if source == "base":
+        checkpoints_dir = get_global_config().base_checkpoints_dir
+    elif source == "sft":
+        checkpoints_dir = get_global_config().chatsft_checkpoints_dir
+    elif source == "rl":
+        checkpoints_dir = get_global_config().chatrl_checkpoints_dir
+    else:
+        raise ValueError(f"Invalid source: {source}")
+
+
     return load_model_from_dir(checkpoints_dir, *args, **kwargs)

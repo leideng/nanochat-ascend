@@ -8,11 +8,11 @@ For details of how the dataset was prepared, see `repackage_data_reference.py`.
 
 import os
 import pyarrow.parquet as pq
-from nanochat.common import get_config
+from nanochat.common import get_global_config
 
 def list_parquet_files(data_dir=None):
     """ Looks into a data dir and returns full paths to all parquet files. """
-    data_dir = get_config().pretrain_dataset if data_dir is None else data_dir
+    data_dir = get_global_config().pretrain_dataset if data_dir is None else data_dir
     parquet_files = sorted([
         f for f in os.listdir(data_dir)
         if f.endswith('.parquet') and not f.endswith('.tmp')
