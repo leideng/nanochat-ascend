@@ -31,7 +31,7 @@ import tempfile
 import argparse
 import torch
 
-from nanochat.common import compute_init, compute_cleanup, print0, get_base_dir, autodetect_device_type
+from nanochat.common import compute_init, compute_cleanup, print0, get_global_config, autodetect_device_type
 from nanochat.tokenizer import HuggingFaceTokenizer, get_token_bytes
 from nanochat.checkpoint_manager import load_model
 from nanochat.core_eval import evaluate_task
@@ -93,31 +93,18 @@ def get_hf_token_bytes(tokenizer, device="cpu"):
 # EVAL_BUNDLE_URL = "https://karpathy-public.s3.us-west-2.amazonaws.com/eval_bundle.zip"
 
 
-def place_eval_bundle(file_path):
-    """Unzip eval_bundle.zip and place it in the base directory."""
-    base_dir = get_base_dir()
-    eval_bundle_dir = os.path.join(base_dir, "eval_bundle")
-    with tempfile.TemporaryDirectory() as tmpdir:
-        with zipfile.ZipFile(file_path, 'r') as zip_ref:
-            zip_ref.extractall(tmpdir)
-        extracted_bundle_dir = os.path.join(tmpdir, "eval_bundle")
-        shutil.move(extracted_bundle_dir, eval_bundle_dir)
-    print0(f"Placed eval_bundle directory at {eval_bundle_dir}")
-
 
 def evaluate_core(model, tokenizer, device, max_per_task=-1):
     """
     Evaluate a base model on the CORE benchmark.
     Returns dict with results, centered_results, and core_metric.
     """
-    base_dir = get_base_dir()
-    eval_bundle_dir = os.path.join(base_dir, "eval_bundle")
+    eval_bundle_dir = get_global_config().eval_dataset
     
     # Download the eval bundle if needed
     if not os.path.exists(eval_bundle_dir):
-        print0("Eval bundle directory does not exist, please download it manually and put it into base_dir/eval_bundle")
+        print0(f"Eval bundle directory does not exist, please download it manually and put it into {eval_bundle_dir}")
         exit(1)
-        #download_file_with_lock(EVAL_BUNDLE_URL, "eval_bundle.zip", postprocess_fn=place_eval_bundle)
 
     config_path = os.path.join(eval_bundle_dir, "core.yaml")
     data_base_path = os.path.join(eval_bundle_dir, "eval_data")
@@ -290,8 +277,8 @@ def main():
 
         # Write CSV output
         if ddp_rank == 0:
-            base_dir = get_base_dir()
-            output_csv_path = os.path.join(base_dir, "base_eval", f"{model_slug}.csv")
+            base_eval_dir = get_global_config().base_eval_dir
+            output_csv_path = os.path.join(base_eval_dir, f"{model_slug}.csv")
             os.makedirs(os.path.dirname(output_csv_path), exist_ok=True)
             with open(output_csv_path, 'w', encoding='utf-8', newline='') as f:
                 f.write(f"{'Task':<35}, {'Accuracy':<10}, {'Centered':<10}\n")

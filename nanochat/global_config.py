@@ -17,6 +17,7 @@ class GlobalConfig:
     base_checkpoints_dir: str = ""
     chatsft_checkpoints_dir: str = ""
     chatrl_checkpoints_dir: str = ""
+    base_eval_dir: str = ""
     
     @classmethod
     def load_from_yaml(cls, config_path: str) -> "GlobalConfig":

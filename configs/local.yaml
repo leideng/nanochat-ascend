@@ -3,7 +3,8 @@ pretrain_dataset: .cache/dataset/pretrain/fineweb-edu-100b-shuffle-sample
 sft_dataset: .cache/dataset/sft/identity_conversations.jsonl #source: https://karpathy-public.s3.us-west-2.amazonaws.com/identity_conversations.jsonl
 eval_dataset: .cache/dataset/eval/core.yaml  #source: https://karpathy-public.s3.us-west-2.amazonaws.com/eval_bundle.zip
 output_dir: .cache/output
-base_checkpoints_dir: .cache/base_checkpoints
-chatsft_checkpoints_dir: .cache/chatsft_checkpoints
-chatrl_checkpoints_dir: .cache/chatrl_checkpoints
+base_checkpoints_dir: .cache/output/base_checkpoints
+chatsft_checkpoints_dir: .cache/output/chatsft_checkpoints
+chatrl_checkpoints_dir: .cache/output/chatrl_checkpoints
+base_eval_dir: .cache/output/base_eval
 enforce_eager: true # disable torch.compile
