@@ -7,6 +7,7 @@ It is a coding benchmark.
 import os
 import re
 from datasets import load_dataset
+from torch.nn.modules import conv
 from nanochat.execution import execute_code
 from tasks.common import Task
 from nanochat.common import get_global_config
@@ -103,3 +104,9 @@ class HumanEval(Task):
         result = execute_code(program)
         success = result.success
         return success
+
+if __name__ == "__main__":
+    humaneval = HumanEval()
+    conversation = humaneval.get_example(0)
+    print(conversation)
+    print(humaneval.evaluate(conversation, "print('Hello, World!')"))
