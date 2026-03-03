@@ -7,6 +7,7 @@ For details of how the dataset was prepared, see `repackage_data_reference.py`.
 """
 
 import os
+import shutil
 import pyarrow.parquet as pq
 from nanochat.common import get_global_config
 
@@ -37,8 +38,116 @@ def parquets_iter_batched(split, data_dir=None, start=0, step=1):
             yield texts
 
 
+def download_url_datasets():
+    """
+    Download the datasets from the URL and save them to the local cache directory.
+
+    sft_dataset: .cache/dataset/sft/identity_conversations.jsonl #source: https://karpathy-public.s3.us-west-2.amazonaws.com/identity_conversations.jsonl
+    simple_spelling_dataset: .cache/dataset/sft/words_alpha.txt  #source:https://raw.githubusercontent.com/dwyl/english-words/refs/heads/master/words_alpha.txt
+    """
+    #just curl down the files and save them to the local cache directory.
+    sft_dataset_url = "https://karpathy-public.s3.us-west-2.amazonaws.com/identity_conversations.jsonl"
+    simple_spelling_dataset_url = "https://raw.githubusercontent.com/dwyl/english-words/refs/heads/master/words_alpha.txt"
+    sft_dataset_path = get_global_config().sft_dataset
+    simple_spelling_dataset_path = get_global_config().simple_spelling_dataset
+    os.makedirs(os.path.dirname(sft_dataset_path), exist_ok=True)
+    os.makedirs(os.path.dirname(simple_spelling_dataset_path), exist_ok=True)
+    os.system(f"curl -o {sft_dataset_path} {sft_dataset_url}")
+    os.system(f"curl -o {simple_spelling_dataset_path} {simple_spelling_dataset_url}")
+
+
+def download_huggingface_datasets():
+    """
+    Download the datasets from the Hugging Face Hub and save them to the local cache directory.
+
+
+    pretrain_dataset: .cache/dataset/pretrain/fineweb-edu-100b-shuffle-sample #source: https://huggingface.co/datasets/karpathy/fineweb-edu-100b-shuffle
+    eval_dataset: .cache/dataset/eval  #source: https://karpathy-public.s3.us-west-2.amazonaws.com/eval_bundle.zip
+    allenai_arc_dataset: .cache/dataset/ai2_arc #source https://huggingface.co/datasets/allenai/ai2_arc
+    openai_gsm8k_dataset: .cache/dataset/gsm8k #source: https://huggingface.co/datasets/openai/gsm8k
+    openai_humaneval_dataset: .cache/dataset/humaneval #source: https://huggingface.co/datasets/openai/openai_humaneval
+    cais_mmlu_dataset: .cache/dataset/mmlu #source: https://huggingface.co/datasets/cais/mmlu
+    huggingface_tb_smol_smoltalk_dataset: .cache/dataset/smol-smoltalk #source: https://huggingface.co/datasets/HuggingFaceTB/smol-smoltalk
+    """
+    from datasets import load_dataset
+
+    pretrain_dataset_path = get_global_config().pretrain_dataset
+    sft_dataset_path = get_global_config().sft_dataset
+    simple_spelling_dataset_path = get_global_config().simple_spelling_dataset
+    eval_dataset_path = get_global_config().eval_dataset
+    allenai_arc_dataset_path = get_global_config().allenai_arc_dataset
+    openai_gsm8k_dataset_path = get_global_config().openai_gsm8k_dataset
+    openai_humaneval_dataset_path = get_global_config().openai_humaneval_dataset
+    cais_mmlu_dataset_path = get_global_config().cais_mmlu_dataset
+    huggingface_tb_smol_smoltalk_dataset_path = get_global_config().huggingface_tb_smol_smoltalk_dataset
+
+    try:
+        pretrain_dataset = load_dataset(pretrain_dataset_path, split="train")
+    except Exception:
+        # Local cache corrupted or incomplete; remove and re-download from Hub
+        if os.path.exists(pretrain_dataset_path):
+            shutil.rmtree(pretrain_dataset_path)
+        pretrain_dataset = load_dataset("karpathy/fineweb-edu-100b-shuffle", split="train")
+        pretrain_dataset.save_to_disk(pretrain_dataset_path)
+        
+    try:
+        eval_dataset = load_dataset(eval_dataset_path, split="train")
+    except Exception:
+        # Local cache corrupted or incomplete; remove and re-download from Hub
+        if os.path.exists(eval_dataset_path):
+            shutil.rmtree(eval_dataset_path)
+        eval_dataset = load_dataset("karpathy/eval_bundle", split="train")
+        eval_dataset.save_to_disk(eval_dataset_path)
+        
+    try:
+        allenai_arc_dataset = load_dataset(allenai_arc_dataset_path, split="train")
+    except Exception:
+        # Local cache corrupted or incomplete; remove and re-download from Hub
+        if os.path.exists(allenai_arc_dataset_path):
+            shutil.rmtree(allenai_arc_dataset_path)
+        allenai_arc_dataset = load_dataset("allenai/ai2_arc", split="train")
+        allenai_arc_dataset.save_to_disk(allenai_arc_dataset_path)
+        
+    try:
+        openai_gsm8k_dataset = load_dataset(openai_gsm8k_dataset_path, split="train")
+    except Exception:
+        # Local cache corrupted or incomplete; remove and re-download from Hub
+        if os.path.exists(openai_gsm8k_dataset_path):
+            shutil.rmtree(openai_gsm8k_dataset_path)
+        openai_gsm8k_dataset = load_dataset("openai/gsm8k", split="train")
+        openai_gsm8k_dataset.save_to_disk(openai_gsm8k_dataset_path)
+        
+    try:
+        openai_humaneval_dataset = load_dataset(openai_humaneval_dataset_path, split="train")
+    except Exception:
+        # Local cache corrupted or incomplete; remove and re-download from Hub
+        if os.path.exists(openai_humaneval_dataset_path):
+            shutil.rmtree(openai_humaneval_dataset_path)
+        openai_humaneval_dataset = load_dataset("openai/openai_humaneval", split="train")
+        openai_humaneval_dataset.save_to_disk(openai_humaneval_dataset_path)
+    try:
+        cais_mmlu_dataset = load_dataset(cais_mmlu_dataset_path, split="train")
+    except Exception:
+        # Local cache corrupted or incomplete; remove and re-download from Hub
+        if os.path.exists(cais_mmlu_dataset_path):
+            shutil.rmtree(cais_mmlu_dataset_path)
+        cais_mmlu_dataset = load_dataset("cais/mmlu", split="train")
+        cais_mmlu_dataset.save_to_disk(cais_mmlu_dataset_path)
+
+    try:
+        huggingface_tb_smol_smoltalk_dataset = load_dataset(huggingface_tb_smol_smoltalk_dataset_path, split="train")
+    except Exception:
+        # Local cache corrupted or incomplete; remove and re-download from Hub
+        if os.path.exists(huggingface_tb_smol_smoltalk_dataset_path):
+            shutil.rmtree(huggingface_tb_smol_smoltalk_dataset_path)
+        huggingface_tb_smol_smoltalk_dataset = load_dataset("HuggingFaceTB/smol-smoltalk", split="train")
+        huggingface_tb_smol_smoltalk_dataset.save_to_disk(huggingface_tb_smol_smoltalk_dataset_path)    
+
 # you can run it in the project root directory by running `python -m nanochat.dataset`
 if __name__ == "__main__":    
+    
+    download_datasets()
+
     parquet_files = list_parquet_files()
     
     print("="*20 + "Parquet files info" + "="*20)
@@ -53,7 +162,7 @@ if __name__ == "__main__":
     print(f"Number of rows in the first parquet file: {pf_first.metadata.num_rows}")
     print(f"Number of columns in the first parquet file: {pf_first.metadata.num_columns}")
 
-    print("="*20 + "First parquet file metadata" + "="*20)
+    print("="*20 + "Last parquet file metadata" + "="*20)
     print(f"Number of rows in the last parquet file: {pf_last.metadata.num_rows}")
     print(f"Number of row groups in the last parquet file: {pf_last.metadata.num_row_groups}")
     print(f"Number of columns in the last parquet file: {pf_last.metadata.num_columns}")
