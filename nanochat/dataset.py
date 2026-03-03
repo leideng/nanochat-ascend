@@ -50,9 +50,9 @@ def download_url_datasets():
     """
     Download the datasets from the URL and save them to the local cache directory.
 
-    eval_dataset: .cache/dataset/eval  #source: https://karpathy-public.s3.us-west-2.amazonaws.com/eval_bundle.zip
-    sft_dataset: .cache/dataset/sft/identity_conversations.jsonl #source: https://karpathy-public.s3.us-west-2.amazonaws.com/identity_conversations.jsonl
-    simple_spelling_dataset: .cache/dataset/sft/words_alpha.txt  #source:https://raw.githubusercontent.com/dwyl/english-words/refs/heads/master/words_alpha.txt
+    1. eval_dataset: .cache/dataset/eval  #source: https://karpathy-public.s3.us-west-2.amazonaws.com/eval_bundle.zip
+    2. sft_dataset: .cache/dataset/sft/identity_conversations.jsonl #source: https://karpathy-public.s3.us-west-2.amazonaws.com/identity_conversations.jsonl
+    3. simple_spelling_dataset: .cache/dataset/sft/words_alpha.txt  #source:https://raw.githubusercontent.com/dwyl/english-words/refs/heads/master/words_alpha.txt
     """
     #just curl down the files and save them to the local cache directory.
     eval_dataset_url = "https://karpathy-public.s3.us-west-2.amazonaws.com/eval_bundle.zip"
@@ -116,12 +116,12 @@ def download_huggingface_datasets():
     """
     Download the datasets from the Hugging Face Hub and save them to the local cache directory.
 
-    pretrain_dataset: .cache/dataset/pretrain/fineweb-edu-100b-shuffle-sample #source: https://huggingface.co/datasets/karpathy/fineweb-edu-100b-shuffle
-    allenai_arc_dataset: .cache/dataset/ai2_arc #source https://huggingface.co/datasets/allenai/ai2_arc
-    openai_gsm8k_dataset: .cache/dataset/gsm8k #source: https://huggingface.co/datasets/openai/gsm8k
-    openai_humaneval_dataset: .cache/dataset/humaneval #source: https://huggingface.co/datasets/openai/openai_humaneval
-    cais_mmlu_dataset: .cache/dataset/mmlu #source: https://huggingface.co/datasets/cais/mmlu
-    huggingface_tb_smol_smoltalk_dataset: .cache/dataset/smol-smoltalk #source: https://huggingface.co/datasets/HuggingFaceTB/smol-smoltalk
+    1. pretrain_dataset: .cache/dataset/pretrain/fineweb-edu-100b-shuffle-sample #source: https://huggingface.co/datasets/karpathy/fineweb-edu-100b-shuffle
+    2. allenai_arc_dataset: .cache/dataset/ai2_arc #source https://huggingface.co/datasets/allenai/ai2_arc
+    3. openai_gsm8k_dataset: .cache/dataset/gsm8k #source: https://huggingface.co/datasets/openai/gsm8k
+    4. openai_humaneval_dataset: .cache/dataset/humaneval #source: https://huggingface.co/datasets/openai/openai_humaneval
+    5. cais_mmlu_dataset: .cache/dataset/mmlu #source: https://huggingface.co/datasets/cais/mmlu
+    6. huggingface_tb_smol_smoltalk_dataset: .cache/dataset/smol-smoltalk #source: https://huggingface.co/datasets/HuggingFaceTB/smol-smoltalk
     """
     cfg = get_global_config()
     pretrain_dataset_path = cfg.pretrain_dataset
@@ -132,29 +132,26 @@ def download_huggingface_datasets():
     cais_mmlu_dataset_path = cfg.cais_mmlu_dataset
     huggingface_tb_smol_smoltalk_dataset_path = cfg.huggingface_tb_smol_smoltalk_dataset
 
-    total = 7
+    total = 6
     _progress(f"Preparing {total} Hugging Face datasets (Hub downloads may show progress bars below).")
 
     pretrain_dataset = _ensure_dataset(
         1, total, "pretrain", pretrain_dataset_path, "karpathy/fineweb-edu-100b-shuffle"
     )
-    eval_dataset = _ensure_dataset(
-        2, total, "eval", eval_dataset_path, "karpathy/eval_bundle"
-    )
     allenai_arc_dataset = _ensure_dataset(
-        3, total, "allenai/ai2_arc", allenai_arc_dataset_path, "allenai/ai2_arc"
+        2, total, "allenai/ai2_arc", allenai_arc_dataset_path, "allenai/ai2_arc"
     )
     openai_gsm8k_dataset = _ensure_dataset(
-        4, total, "openai/gsm8k", openai_gsm8k_dataset_path, "openai/gsm8k"
+        3, total, "openai/gsm8k", openai_gsm8k_dataset_path, "openai/gsm8k"
     )
     openai_humaneval_dataset = _ensure_dataset(
-        5, total, "openai_humaneval", openai_humaneval_dataset_path, "openai/openai_humaneval"
+        4, total, "openai_humaneval", openai_humaneval_dataset_path, "openai/openai_humaneval"
     )
     cais_mmlu_dataset = _ensure_dataset(
-        6, total, "cais/mmlu", cais_mmlu_dataset_path, "cais/mmlu"
+        5, total, "cais/mmlu", cais_mmlu_dataset_path, "cais/mmlu"
     )
     huggingface_tb_smol_smoltalk_dataset = _ensure_dataset(
-        7, total, "smol-smoltalk", huggingface_tb_smol_smoltalk_dataset_path, "HuggingFaceTB/smol-smoltalk"
+        6, total, "smol-smoltalk", huggingface_tb_smol_smoltalk_dataset_path, "HuggingFaceTB/smol-smoltalk"
     )
 
     _progress("All Hugging Face datasets ready.")    
@@ -164,8 +161,8 @@ if __name__ == "__main__":
     print("Downloading URL datasets...")   
     download_url_datasets()    
 
-    #print("Downloading Hugging Face datasets...")
-    #download_huggingface_datasets()
+    print("Downloading Hugging Face datasets...")
+    download_huggingface_datasets()
 
     parquet_files = list_parquet_files()
     
