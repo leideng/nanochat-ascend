@@ -8,6 +8,7 @@ For details of how the dataset was prepared, see `repackage_data_reference.py`.
 
 import os
 import shutil
+import sys
 import time
 import pyarrow.parquet as pq
 from nanochat.common import get_global_config
@@ -93,6 +94,11 @@ def _ensure_dataset(step: int, total: int, name: str, local_path: str, hub_id: s
         return ds
     except Exception:
         if os.path.exists(local_path):
+            _progress(f"[{step}/{total}] {name}: incomplete cache found at {local_path}")
+            reply = input("Remove this cache and re-download? [y/N] (default: no, press Enter to skip): ").strip().lower()
+            if reply not in ("y", "yes"):
+                _progress("Aborted by user.")
+                sys.exit(1)
             _progress(f"[{step}/{total}] {name}: removing incomplete cache at {local_path} ...")
             shutil.rmtree(local_path)
         _progress(f"[{step}/{total}] {name}: downloading from Hub '{hub_id}' (may show progress below) ...")
