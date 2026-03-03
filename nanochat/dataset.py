@@ -60,16 +60,27 @@ def download_url_datasets():
     eval_dataset_path = get_global_config().eval_dataset
     sft_dataset_path = get_global_config().sft_dataset
     simple_spelling_dataset_path = get_global_config().simple_spelling_dataset
-    os.makedirs(os.path.dirname(eval_dataset_path), exist_ok=True)
-    os.makedirs(os.path.dirname(sft_dataset_path), exist_ok=True)
-    os.makedirs(os.path.dirname(simple_spelling_dataset_path), exist_ok=True)
-    print(f"Downloading eval dataset from {eval_dataset_url} to {eval_dataset_path}...")
-    os.system(f"curl -o {eval_dataset_path} {eval_dataset_url}")
-    print(f"Downloading sft dataset from {sft_dataset_url} to {sft_dataset_path}...")
-    os.system(f"curl -o {sft_dataset_path} {sft_dataset_url}")
-    print(f"Downloading simple spelling dataset from {simple_spelling_dataset_url} to {simple_spelling_dataset_path}...")
-    os.system(f"curl -o {simple_spelling_dataset_path} {simple_spelling_dataset_url}")
+
+    if not os.path.exists(eval_dataset_path):
+        os.makedirs(os.path.dirname(eval_dataset_path), exist_ok=True)
+        print(f"Downloading eval dataset from {eval_dataset_url} to {eval_dataset_path}...")
+        os.system(f"curl -o {eval_dataset_path} {eval_dataset_url}")
+    else:
+        print(f"Eval dataset already exists at {eval_dataset_path}")
+    if not os.path.exists(sft_dataset_path):
+        os.makedirs(os.path.dirname(sft_dataset_path), exist_ok=True)
+        print(f"Downloading sft dataset from {sft_dataset_url} to {sft_dataset_path}...")
+        os.system(f"curl -o {sft_dataset_path} {sft_dataset_url}")
+    else:
+        print(f"Sft dataset already exists at {sft_dataset_path}")
+    if not os.path.exists(simple_spelling_dataset_path):
+        os.makedirs(os.path.dirname(simple_spelling_dataset_path), exist_ok=True)
+        print(f"Downloading simple spelling dataset from {simple_spelling_dataset_url} to {simple_spelling_dataset_path}...")
+        os.system(f"curl -o {simple_spelling_dataset_path} {simple_spelling_dataset_url}")
+    else:
+        print(f"Simple spelling dataset already exists at {simple_spelling_dataset_path}")
     print(f"Downloaded all datasets successfully.")
+
 
 def _ensure_dataset(step: int, total: int, name: str, local_path: str, hub_id: str):
     """Load dataset from local path or download from Hub, with progress prints. Returns the dataset."""
@@ -147,8 +158,8 @@ if __name__ == "__main__":
     print("Downloading URL datasets...")   
     download_url_datasets()    
 
-    print("Downloading Hugging Face datasets...")
-    download_huggingface_datasets()
+    #print("Downloading Hugging Face datasets...")
+    #download_huggingface_datasets()
 
     parquet_files = list_parquet_files()
     
