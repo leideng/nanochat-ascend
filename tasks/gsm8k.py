@@ -123,3 +123,15 @@ class GSM8K(Task):
         is_correct = self.evaluate(conversation, assistant_response)
         is_correct_float = float(is_correct)
         return is_correct_float
+
+if __name__ == "__main__":
+    gsm8k = GSM8K(subset="main", split="train")
+    conversation = gsm8k.get_example(0)
+    print(conversation)
+    print(gsm8k.evaluate(conversation, "#### 10"))
+    print(gsm8k.evaluate(conversation, "#### 16"))  #return true here
+    print(gsm8k.evaluate(conversation, "#### 30"))
+    print(gsm8k.evaluate(conversation, "#### 40"))
+    print(gsm8k.evaluate(conversation, "#### 50"))
+    print(gsm8k.evaluate(conversation, "#### 60"))
+    print(gsm8k.evaluate(conversation, "#### 70"))
