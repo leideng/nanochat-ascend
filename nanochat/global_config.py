@@ -10,10 +10,19 @@ import json
 class GlobalConfig:
     device: str = "cpu"
     enforce_eager: bool = True
+
+    ## dataset paths
     pretrain_dataset: str = ""
     sft_dataset: str = ""
     simple_spelling_dataset: str = ""
     eval_dataset: str = ""
+    allenai_arc_dataset: str = ""
+    openai_gsm8k_dataset: str = ""
+    openai_humaneval_dataset: str = ""
+    cais_mmlu_dataset: str = ""
+    huggingface_tb_smol_smoltalk_dataset: str = ""
+
+    ## output paths
     output_dir: str = ""
     base_checkpoints_dir: str = ""
     chatsft_checkpoints_dir: str = ""
