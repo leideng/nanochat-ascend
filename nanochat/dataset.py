@@ -114,7 +114,9 @@ def download_huggingface_datasets():
     pretrain_dataset = _ensure_dataset(
         1, total, "pretrain", pretrain_dataset_path, "karpathy/fineweb-edu-100b-shuffle"
     )
-    eval_dataset = _ensure_dataset(2, total, "eval", eval_dataset_path, "karpathy/eval_bundle")
+    eval_dataset = _ensure_dataset(
+        2, total, "eval", eval_dataset_path, "karpathy/eval_bundle"
+    )
     allenai_arc_dataset = _ensure_dataset(
         3, total, "allenai/ai2_arc", allenai_arc_dataset_path, "allenai/ai2_arc"
     )
