@@ -3,8 +3,10 @@ The MMLU dataset.
 https://huggingface.co/datasets/cais/mmlu
 """
 
+import os
 from datasets import load_dataset
 from tasks.common import Task, render_mc
+from nanochat.common import get_global_config
 
 class MMLU(Task):
 
@@ -19,7 +21,13 @@ class MMLU(Task):
             assert split == "train", "auxiliary_train must be split into train"
         self.subset = subset
         self.split = split
-        self.ds = load_dataset("cais/mmlu", subset, split=split).shuffle(seed=42)
+        local_dir = get_global_config().cais_mmlu_dataset
+        if local_dir and os.path.isdir(local_dir):
+            print(f"Loading MMLU dataset from local directory {local_dir}...")
+            self.ds = load_dataset(local_dir, subset, split=split).shuffle(seed=42)
+        else:
+            print(f"Loading MMLU dataset from Hugging Face Hub...")
+            self.ds = load_dataset("cais/mmlu", subset, split=split).shuffle(seed=42)
         if subset == "auxiliary_train":
             # I don't understand why but the auxiliary_train rows have some weird additional 'train' wrapper
             self.ds = self.ds.map(lambda row: row['train'], remove_columns=['train'])

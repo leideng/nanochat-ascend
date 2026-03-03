@@ -14,9 +14,11 @@ Working 50 minutes, she earned 0.2 x 50 = $<<0.2*50=10>>10.
 Notice that GSM8K uses tool calls inside << >> tags.
 """
 
+import os
 import re
 from datasets import load_dataset
 from tasks.common import Task
+from nanochat.common import get_global_config
 
 
 GSM_RE = re.compile(r"#### (\-?[0-9\.\,]+)")
@@ -40,7 +42,13 @@ class GSM8K(Task):
         super().__init__(**kwargs)
         assert subset in ["main", "socratic"], "GSM8K subset must be main|socratic"
         assert split in ["train", "test"], "GSM8K split must be train|test"
-        self.ds = load_dataset("openai/gsm8k", subset, split=split).shuffle(seed=42)
+        local_dir = get_global_config().openai_gsm8k_dataset
+        if local_dir and os.path.isdir(local_dir):
+            print(f"Loading GSM8K dataset from local directory {local_dir}...")
+            self.ds = load_dataset(local_dir, subset, split=split).shuffle(seed=42)
+        else:
+            print(f"Loading GSM8K dataset from Hugging Face Hub...")
+            self.ds = load_dataset("openai/gsm8k", subset, split=split).shuffle(seed=42)
 
     @property
     def eval_type(self):

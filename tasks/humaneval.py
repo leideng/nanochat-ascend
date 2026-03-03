@@ -4,10 +4,12 @@ Btw this dataset is a misnomer and has nothing to do with humans.
 It is a coding benchmark.
 """
 
+import os
 import re
 from datasets import load_dataset
 from nanochat.execution import execute_code
 from tasks.common import Task
+from nanochat.common import get_global_config
 
 def extract_imports(prompt):
     """Extract import statements from the beginning of a code block."""
@@ -48,7 +50,13 @@ class HumanEval(Task):
 
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
-        self.ds = load_dataset("openai/openai_humaneval", split="test").shuffle(seed=42)
+        local_dir = get_global_config().openai_humaneval_dataset
+        if local_dir and os.path.isdir(local_dir):
+            print(f"Loading HumanEval dataset from local directory {local_dir}...")
+            self.ds = load_dataset(local_dir, split="test").shuffle(seed=42)
+        else:
+            print(f"Loading HumanEval dataset from Hugging Face Hub...")
+            self.ds = load_dataset("openai/openai_humaneval", split="test").shuffle(seed=42)
 
     @property
     def eval_type(self):
