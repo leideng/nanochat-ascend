@@ -49,19 +49,27 @@ def download_url_datasets():
     """
     Download the datasets from the URL and save them to the local cache directory.
 
+    eval_dataset: .cache/dataset/eval  #source: https://karpathy-public.s3.us-west-2.amazonaws.com/eval_bundle.zip
     sft_dataset: .cache/dataset/sft/identity_conversations.jsonl #source: https://karpathy-public.s3.us-west-2.amazonaws.com/identity_conversations.jsonl
     simple_spelling_dataset: .cache/dataset/sft/words_alpha.txt  #source:https://raw.githubusercontent.com/dwyl/english-words/refs/heads/master/words_alpha.txt
     """
     #just curl down the files and save them to the local cache directory.
+    eval_dataset_url = "https://karpathy-public.s3.us-west-2.amazonaws.com/eval_bundle.zip"
     sft_dataset_url = "https://karpathy-public.s3.us-west-2.amazonaws.com/identity_conversations.jsonl"
     simple_spelling_dataset_url = "https://raw.githubusercontent.com/dwyl/english-words/refs/heads/master/words_alpha.txt"
+    eval_dataset_path = get_global_config().eval_dataset
     sft_dataset_path = get_global_config().sft_dataset
     simple_spelling_dataset_path = get_global_config().simple_spelling_dataset
+    os.makedirs(os.path.dirname(eval_dataset_path), exist_ok=True)
     os.makedirs(os.path.dirname(sft_dataset_path), exist_ok=True)
     os.makedirs(os.path.dirname(simple_spelling_dataset_path), exist_ok=True)
+    print(f"Downloading eval dataset from {eval_dataset_url} to {eval_dataset_path}...")
+    os.system(f"curl -o {eval_dataset_path} {eval_dataset_url}")
+    print(f"Downloading sft dataset from {sft_dataset_url} to {sft_dataset_path}...")
     os.system(f"curl -o {sft_dataset_path} {sft_dataset_url}")
+    print(f"Downloading simple spelling dataset from {simple_spelling_dataset_url} to {simple_spelling_dataset_path}...")
     os.system(f"curl -o {simple_spelling_dataset_path} {simple_spelling_dataset_url}")
-
+    print(f"Downloaded all datasets successfully.")
 
 def _ensure_dataset(step: int, total: int, name: str, local_path: str, hub_id: str):
     """Load dataset from local path or download from Hub, with progress prints. Returns the dataset."""
@@ -92,7 +100,6 @@ def download_huggingface_datasets():
     Download the datasets from the Hugging Face Hub and save them to the local cache directory.
 
     pretrain_dataset: .cache/dataset/pretrain/fineweb-edu-100b-shuffle-sample #source: https://huggingface.co/datasets/karpathy/fineweb-edu-100b-shuffle
-    eval_dataset: .cache/dataset/eval  #source: https://karpathy-public.s3.us-west-2.amazonaws.com/eval_bundle.zip
     allenai_arc_dataset: .cache/dataset/ai2_arc #source https://huggingface.co/datasets/allenai/ai2_arc
     openai_gsm8k_dataset: .cache/dataset/gsm8k #source: https://huggingface.co/datasets/openai/gsm8k
     openai_humaneval_dataset: .cache/dataset/humaneval #source: https://huggingface.co/datasets/openai/openai_humaneval
