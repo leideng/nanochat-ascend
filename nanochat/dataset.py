@@ -7,12 +7,10 @@ For details of how the dataset was prepared, see `repackage_data_reference.py`.
 """
 
 import os
-import shutil
-import sys
 import time
 import pyarrow.parquet as pq
+from huggingface_hub import snapshot_download
 from nanochat.common import get_global_config
-from datasets import load_dataset
 
 
 def _progress(msg: str) -> None:
@@ -83,106 +81,68 @@ def download_url_datasets():
     print(f"Downloaded all datasets successfully.")
 
 
-def _ensure_dataset(
+def _download_repo_snapshot(
     step: int,
     total: int,
     name: str,
-    local_path: str,
-    hub_id: str,
-    subset: str | None = None,
-    split: str = "train",
+    local_dir: str,
+    repo_id: str,
 ):
-    """Load dataset from local path or download from Hub, with progress prints. Returns the dataset.
-    subset: optional dataset config/subset name (e.g. 'ARC-Easy' for allenai/ai2_arc).
-    split: dataset split to load (e.g. 'train', 'test', 'validation').
-    """
-    _progress(f"[{step}/{total}] {name}: checking {local_path} ...")
+    """Download entire dataset repository from Hugging Face Hub using snapshot_download."""
+    _progress(f"[{step}/{total}] {name}: checking {local_dir} ...")
     t0 = time.monotonic()
-    try:
-        ds = load_dataset(local_path, split=split)
-        elapsed = time.monotonic() - t0
-        _progress(f"[{step}/{total}] {name}: loaded locally in {elapsed:.1f}s")
-        return ds
-    except Exception:
-        if os.path.exists(local_path):
-            _progress(f"[{step}/{total}] {name}: incomplete cache found at {local_path}")
-            reply = input("Remove this cache and re-download? [y/N] (default: no, press Enter to skip): ").strip().lower()
-            if reply not in ("y", "yes"):
-                _progress("Aborted by user.")
-                sys.exit(1)
-            _progress(f"[{step}/{total}] {name}: removing incomplete cache at {local_path} ...")
-            shutil.rmtree(local_path)
-        _progress(f"[{step}/{total}] {name}: downloading from Hub '{hub_id}' (may show progress below) ...")
-        t_dl = time.monotonic()
-        if subset is not None:
-            ds = load_dataset(hub_id, subset, split=split)
-        else:
-            ds = load_dataset(hub_id, split=split)
-        _progress(f"[{step}/{total}] {name}: download finished in {time.monotonic() - t_dl:.1f}s")
-        _progress(f"[{step}/{total}] {name}: saving to disk {local_path} ...")
-        t_save = time.monotonic()
-        ds.save_to_disk(local_path)
-        _progress(f"[{step}/{total}] {name}: saved in {time.monotonic() - t_save:.1f}s (total {time.monotonic() - t0:.1f}s)")
-        return ds
+    if os.path.isdir(local_dir) and os.listdir(local_dir):
+        _progress(f"[{step}/{total}] {name}: already exists at {local_dir} (skipping)")
+        return
+    _progress(f"[{step}/{total}] {name}: downloading full repo '{repo_id}' to {local_dir} ...")
+    snapshot_download(
+        repo_id=repo_id,
+        repo_type="dataset",
+        local_dir=local_dir,
+    )
+    _progress(f"[{step}/{total}] {name}: finished in {time.monotonic() - t0:.1f}s")
 
 
 def download_huggingface_datasets():
     """
-    Download the datasets from the Hugging Face Hub and save them to the local cache directory.
+    Download full raw dataset repositories from the Hugging Face Hub using snapshot_download.
+    Each repo is downloaded entirely (all subsets and metadata) to the configured local_dir.
 
-    1. pretrain_dataset: .cache/dataset/pretrain/fineweb-edu-100b-shuffle-sample #source: https://huggingface.co/datasets/karpathy/fineweb-edu-100b-shuffle
-    2. allenai_arc_dataset: .cache/dataset/ai2_arc #source https://huggingface.co/datasets/allenai/ai2_arc
-    3. openai_gsm8k_dataset: .cache/dataset/gsm8k #source: https://huggingface.co/datasets/openai/gsm8k
-    4. openai_humaneval_dataset: .cache/dataset/humaneval #source: https://huggingface.co/datasets/openai/openai_humaneval
-    5. cais_mmlu_dataset: .cache/dataset/mmlu #source: https://huggingface.co/datasets/cais/mmlu
-    6. huggingface_tb_smol_smoltalk_dataset: .cache/dataset/smol-smoltalk #source: https://huggingface.co/datasets/HuggingFaceTB/smol-smoltalk
+    1. pretrain_dataset: .cache/dataset/pretrain/... # source: karpathy/fineweb-edu-100b-shuffle
+    2. allenai_arc_dataset: .cache/dataset/ai2_arc   # source: allenai/ai2_arc
+    3. openai_gsm8k_dataset: .cache/dataset/gsm8k   # source: openai/gsm8k
+    4. openai_humaneval_dataset: .cache/dataset/humaneval # source: openai/openai_humaneval
+    5. cais_mmlu_dataset: .cache/dataset/mmlu       # source: cais/mmlu
+    6. huggingface_tb_smol_smoltalk_dataset: .cache/dataset/smol-smoltalk # source: HuggingFaceTB/smol-smoltalk
     """
     cfg = get_global_config()
     pretrain_dataset_path = cfg.pretrain_dataset
-    eval_dataset_path = cfg.eval_dataset
     allenai_arc_dataset_path = cfg.allenai_arc_dataset
     openai_gsm8k_dataset_path = cfg.openai_gsm8k_dataset
     openai_humaneval_dataset_path = cfg.openai_humaneval_dataset
     cais_mmlu_dataset_path = cfg.cais_mmlu_dataset
     huggingface_tb_smol_smoltalk_dataset_path = cfg.huggingface_tb_smol_smoltalk_dataset
 
-    total = 7
-    _progress(f"Preparing {total} Hugging Face datasets (Hub downloads may show progress bars below).")
+    total = 6
+    _progress(f"Preparing {total} Hugging Face datasets (full repo snapshot_download).")
 
-    pretrain_dataset = _ensure_dataset(
-        1, total, "pretrain", pretrain_dataset_path, "karpathy/fineweb-edu-100b-shuffle"
+    _download_repo_snapshot(
+        1, total, "pretrain (fineweb-edu-100b-shuffle)", pretrain_dataset_path, "karpathy/fineweb-edu-100b-shuffle"
     )
-
-    os.makedirs(allenai_arc_dataset_path, exist_ok=True)
-    _ensure_dataset(
-        2,
-        total,
-        "allenai/ai2_arc (ARC-Easy)",
-        os.path.join(allenai_arc_dataset_path, "ARC-Easy"),
-        "allenai/ai2_arc",
-        subset="ARC-Easy",
-        split="train",
+    _download_repo_snapshot(
+        2, total, "allenai/ai2_arc", allenai_arc_dataset_path, "allenai/ai2_arc"
     )
-    _ensure_dataset(
-        3,
-        total,
-        "allenai/ai2_arc (ARC-Challenge)",
-        os.path.join(allenai_arc_dataset_path, "ARC-Challenge"),
-        "allenai/ai2_arc",
-        subset="ARC-Challenge",
-        split="train",
+    _download_repo_snapshot(
+        3, total, "openai/gsm8k", openai_gsm8k_dataset_path, "openai/gsm8k"
     )
-    openai_gsm8k_dataset = _ensure_dataset(
-        4, total, "openai/gsm8k", openai_gsm8k_dataset_path, "openai/gsm8k"
+    _download_repo_snapshot(
+        4, total, "openai_humaneval", openai_humaneval_dataset_path, "openai/openai_humaneval"
     )
-    openai_humaneval_dataset = _ensure_dataset(
-        5, total, "openai_humaneval", openai_humaneval_dataset_path, "openai/openai_humaneval"
+    _download_repo_snapshot(
+        5, total, "cais/mmlu", cais_mmlu_dataset_path, "cais/mmlu"
     )
-    cais_mmlu_dataset = _ensure_dataset(
-        6, total, "cais/mmlu", cais_mmlu_dataset_path, "cais/mmlu"
-    )
-    huggingface_tb_smol_smoltalk_dataset = _ensure_dataset(
-        7, total, "smol-smoltalk", huggingface_tb_smol_smoltalk_dataset_path, "HuggingFaceTB/smol-smoltalk"
+    _download_repo_snapshot(
+        6, total, "smol-smoltalk", huggingface_tb_smol_smoltalk_dataset_path, "HuggingFaceTB/smol-smoltalk"
     )
 
     _progress("All Hugging Face datasets ready.")    
