@@ -83,12 +83,23 @@ def download_url_datasets():
     print(f"Downloaded all datasets successfully.")
 
 
-def _ensure_dataset(step: int, total: int, name: str, local_path: str, hub_id: str):
-    """Load dataset from local path or download from Hub, with progress prints. Returns the dataset."""
+def _ensure_dataset(
+    step: int,
+    total: int,
+    name: str,
+    local_path: str,
+    hub_id: str,
+    subset: str | None = None,
+    split: str = "train",
+):
+    """Load dataset from local path or download from Hub, with progress prints. Returns the dataset.
+    subset: optional dataset config/subset name (e.g. 'ARC-Easy' for allenai/ai2_arc).
+    split: dataset split to load (e.g. 'train', 'test', 'validation').
+    """
     _progress(f"[{step}/{total}] {name}: checking {local_path} ...")
     t0 = time.monotonic()
     try:
-        ds = load_dataset(local_path, split="train")
+        ds = load_dataset(local_path, split=split)
         elapsed = time.monotonic() - t0
         _progress(f"[{step}/{total}] {name}: loaded locally in {elapsed:.1f}s")
         return ds
@@ -103,7 +114,10 @@ def _ensure_dataset(step: int, total: int, name: str, local_path: str, hub_id: s
             shutil.rmtree(local_path)
         _progress(f"[{step}/{total}] {name}: downloading from Hub '{hub_id}' (may show progress below) ...")
         t_dl = time.monotonic()
-        ds = load_dataset(hub_id, split="train")
+        if subset is not None:
+            ds = load_dataset(hub_id, subset, split=split)
+        else:
+            ds = load_dataset(hub_id, split=split)
         _progress(f"[{step}/{total}] {name}: download finished in {time.monotonic() - t_dl:.1f}s")
         _progress(f"[{step}/{total}] {name}: saving to disk {local_path} ...")
         t_save = time.monotonic()
@@ -132,26 +146,43 @@ def download_huggingface_datasets():
     cais_mmlu_dataset_path = cfg.cais_mmlu_dataset
     huggingface_tb_smol_smoltalk_dataset_path = cfg.huggingface_tb_smol_smoltalk_dataset
 
-    total = 6
+    total = 7
     _progress(f"Preparing {total} Hugging Face datasets (Hub downloads may show progress bars below).")
 
     pretrain_dataset = _ensure_dataset(
         1, total, "pretrain", pretrain_dataset_path, "karpathy/fineweb-edu-100b-shuffle"
     )
-    allenai_arc_dataset = _ensure_dataset(
-        2, total, "allenai/ai2_arc", allenai_arc_dataset_path, "allenai/ai2_arc"
+
+    os.makedirs(allenai_arc_dataset_path, exist_ok=True)
+    _ensure_dataset(
+        2,
+        total,
+        "allenai/ai2_arc (ARC-Easy)",
+        os.path.join(allenai_arc_dataset_path, "ARC-Easy"),
+        "allenai/ai2_arc",
+        subset="ARC-Easy",
+        split="train",
+    )
+    _ensure_dataset(
+        3,
+        total,
+        "allenai/ai2_arc (ARC-Challenge)",
+        os.path.join(allenai_arc_dataset_path, "ARC-Challenge"),
+        "allenai/ai2_arc",
+        subset="ARC-Challenge",
+        split="train",
     )
     openai_gsm8k_dataset = _ensure_dataset(
-        3, total, "openai/gsm8k", openai_gsm8k_dataset_path, "openai/gsm8k"
+        4, total, "openai/gsm8k", openai_gsm8k_dataset_path, "openai/gsm8k"
     )
     openai_humaneval_dataset = _ensure_dataset(
-        4, total, "openai_humaneval", openai_humaneval_dataset_path, "openai/openai_humaneval"
+        5, total, "openai_humaneval", openai_humaneval_dataset_path, "openai/openai_humaneval"
     )
     cais_mmlu_dataset = _ensure_dataset(
-        5, total, "cais/mmlu", cais_mmlu_dataset_path, "cais/mmlu"
+        6, total, "cais/mmlu", cais_mmlu_dataset_path, "cais/mmlu"
     )
     huggingface_tb_smol_smoltalk_dataset = _ensure_dataset(
-        6, total, "smol-smoltalk", huggingface_tb_smol_smoltalk_dataset_path, "HuggingFaceTB/smol-smoltalk"
+        7, total, "smol-smoltalk", huggingface_tb_smol_smoltalk_dataset_path, "HuggingFaceTB/smol-smoltalk"
     )
 
     _progress("All Hugging Face datasets ready.")    
