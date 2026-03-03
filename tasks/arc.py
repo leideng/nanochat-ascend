@@ -3,8 +3,10 @@ The ARC dataset from Allen AI.
 https://huggingface.co/datasets/allenai/ai2_arc
 """
 
+import os
 from datasets import load_dataset
 from tasks.common import Task, render_mc
+from nanochat.common import get_global_config
 
 class ARC(Task):
 
@@ -12,7 +14,13 @@ class ARC(Task):
         super().__init__(**kwargs)
         assert subset in ["ARC-Easy", "ARC-Challenge"], "ARC subset must be ARC-Easy or ARC-Challenge"
         assert split in ["train", "validation", "test"], "ARC split must be train|validation|test"
-        self.ds = load_dataset("allenai/ai2_arc", subset, split=split).shuffle(seed=42)
+        local_dir = get_global_config().allenai_arc_dataset
+        if local_dir and os.path.isdir(local_dir):
+            print(f"Loading ARC dataset from local directory {local_dir}...")
+            self.ds = load_dataset(local_dir, subset, split=split).shuffle(seed=42)
+        else:
+            print(f"Loading ARC dataset from Hugging Face Hub...")
+            self.ds = load_dataset("allenai/ai2_arc", subset, split=split).shuffle(seed=42)
 
     @property
     def eval_type(self):
@@ -46,3 +54,11 @@ class ARC(Task):
         assert assistant_response in conversation['letters'], f"ARC answer {assistant_response} is expected to be one of {conversation['letters']}"
         assistant_message = conversation['messages'][-1]['content'] # e.g. "A"
         return assistant_response == assistant_message
+
+if __name__ == "__main__":
+    arc = ARC(subset="ARC-Easy", split="train")
+    print(arc.get_example(0))
+    print(arc.evaluate(arc.get_example(0), "A"))
+    print(arc.evaluate(arc.get_example(0), "B"))
+    print(arc.evaluate(arc.get_example(0), "C"))
+    print(arc.evaluate(arc.get_example(0), "D"))
