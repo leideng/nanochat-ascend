@@ -52,3 +52,8 @@ class SmolTalk(Task):
             "messages": messages,
         }
         return conversation
+
+if __name__ == "__main__":
+    smoltalk = SmolTalk(split="train")
+    conversation = smoltalk.get_example(0)
+    print(conversation)
