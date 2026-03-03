@@ -66,3 +66,12 @@ class MMLU(Task):
         assert assistant_response in self.letters, f"MMLU answer {assistant_response} is expected to be one of {self.letters}"
         assistant_message = conversation['messages'][-1]['content'] # e.g. "A"
         return assistant_response == assistant_message
+
+if __name__ == "__main__":
+    mmlu = MMLU(subset="all", split="test")
+    conversation = mmlu.get_example(0)
+    print(conversation)
+    print(mmlu.evaluate(conversation, "A"))
+    print(mmlu.evaluate(conversation, "B"))
+    print(mmlu.evaluate(conversation, "C"))
+    print(mmlu.evaluate(conversation, "D"))
