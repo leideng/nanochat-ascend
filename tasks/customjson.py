@@ -63,3 +63,14 @@ class CustomJSON(Task):
         }
         return conversation
 
+
+if __name__ == "__main__":
+    from nanochat.common import get_global_config
+    filepath = get_global_config().sft_dataset
+    if not os.path.exists(filepath):
+        print(f"File {filepath} does not exist")
+        print("Please run the following command to download the file:")
+        print(f"curl -L -o {filepath} https://karpathy-public.s3.us-west-2.amazonaws.com/identity_conversations.jsonl")
+        exit(1)
+    task = CustomJSON(filepath=filepath)
+    print(task.get_example(0))
