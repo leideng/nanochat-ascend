@@ -40,7 +40,7 @@ Use this skill to answer dataset questions in `nanochat-ascend` precisely. Focus
 
 ## Reference File
 
-Read [references/datasets.md](/home/leo/code/nanollm/nanochat-ascend/skills/data-view/references/datasets.md) when you need:
+Read [references/datasets.md](references/datasets.md) when you need:
 - concrete samples for each configured dataset
 - a quick summary of how each dataset is used
 - the file/module path that consumes each dataset

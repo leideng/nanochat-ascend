@@ -9,7 +9,7 @@ Use this skill for shape-first validation in `nanochat-ascend`.
 
 ## When to use
 
-- Model `__init__` changes in [nanochat/gpt.py](/home/leo/code/nanollm/nanochat-ascend/nanochat/gpt.py)
+- Model `__init__` changes in [nanochat/gpt.py](../../nanochat/gpt.py)
 - Meta-device initialization or `to_empty()` flows
 - Tensor shape or dtype plumbing
 - Attention mask construction
@@ -64,8 +64,8 @@ Adjust the config fields to match the code you touched. Keep dimensions tiny.
 ## Repo-specific guidance
 
 - Prefer validating model construction before trying a meta forward pass.
-- If you touch checkpoint loading, first verify the model can still be instantiated on meta with the same config path used by [nanochat/checkpoint_manager.py](/home/leo/code/nanollm/nanochat-ascend/nanochat/checkpoint_manager.py).
-- If you touch training setup, inspect [scripts/base_train.py](/home/leo/code/nanollm/nanochat-ascend/scripts/base_train.py) first because it already depends on meta-device initialization.
+- If you touch checkpoint loading, first verify the model can still be instantiated on meta with the same config path used by [nanochat/checkpoint_manager.py](../../nanochat/checkpoint_manager.py).
+- If you touch training setup, inspect [scripts/base_train.py](../../scripts/base_train.py) first because it already depends on meta-device initialization.
 - Never switch to NPU execution as part of this skill. If the bug is NPU-only, ask the user for Ascend logs after the meta validation is done.
 
 ## Expected deliverable
