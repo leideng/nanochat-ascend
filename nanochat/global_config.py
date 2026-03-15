@@ -3,6 +3,7 @@ Configuration for the nanochat-ascend model.
 """
 
 from dataclasses import dataclass, fields
+import os
 import yaml
 import json
 
@@ -30,7 +31,74 @@ class GlobalConfig:
     base_eval_dir: str = ""
     tokenizer_dir: str = ""
     report_dir: str = ""
-    
+
+    @staticmethod
+    def _resolve_path(base: str, value: str) -> str:
+        if not value:
+            return value
+        if os.path.isabs(value) or not base:
+            return value
+        return os.path.join(base, value)
+
+    @classmethod
+    def _expand_hierarchical_paths(cls, data: dict) -> dict:
+        expanded = dict(data)
+        expanded.pop("dataset", None)
+        expanded.pop("output", None)
+
+        dataset_cfg = data.get("dataset")
+        if dataset_cfg is not None:
+            if not isinstance(dataset_cfg, dict):
+                raise ValueError("Config key dataset must be a mapping")
+            dataset_root = dataset_cfg.get("root", "")
+            dataset_keys = {
+                "pretrain": "pretrain_dataset",
+                "sft": "sft_dataset",
+                "simple_spelling": "simple_spelling_dataset",
+                "eval": "eval_dataset",
+                "allenai_arc": "allenai_arc_dataset",
+                "openai_gsm8k": "openai_gsm8k_dataset",
+                "openai_humaneval": "openai_humaneval_dataset",
+                "cais_mmlu": "cais_mmlu_dataset",
+                "huggingface_tb_smol_smoltalk": "huggingface_tb_smol_smoltalk_dataset",
+            }
+            for child_key, flat_key in dataset_keys.items():
+                if child_key in dataset_cfg:
+                    expanded[flat_key] = cls._resolve_path(dataset_root, dataset_cfg[child_key])
+
+        output_cfg = data.get("output")
+        if output_cfg is not None:
+            if not isinstance(output_cfg, dict):
+                raise ValueError("Config key output must be a mapping")
+            output_root = output_cfg.get("root", "")
+            if output_root:
+                expanded["output_dir"] = output_root
+
+            output_keys = {
+                "base_eval": "base_eval_dir",
+                "tokenizer": "tokenizer_dir",
+                "report": "report_dir",
+            }
+            for child_key, flat_key in output_keys.items():
+                if child_key in output_cfg:
+                    expanded[flat_key] = cls._resolve_path(output_root, output_cfg[child_key])
+
+            checkpoints_cfg = output_cfg.get("checkpoints")
+            if checkpoints_cfg is not None:
+                if not isinstance(checkpoints_cfg, dict):
+                    raise ValueError("Config key output.checkpoints must be a mapping")
+                checkpoints_root = cls._resolve_path(output_root, checkpoints_cfg.get("root", ""))
+                checkpoint_keys = {
+                    "base": "base_checkpoints_dir",
+                    "chatsft": "chatsft_checkpoints_dir",
+                    "chatrl": "chatrl_checkpoints_dir",
+                }
+                for child_key, flat_key in checkpoint_keys.items():
+                    if child_key in checkpoints_cfg:
+                        expanded[flat_key] = cls._resolve_path(checkpoints_root, checkpoints_cfg[child_key])
+
+        return expanded
+
     @classmethod
     def load_from_yaml(cls, config_path: str) -> "GlobalConfig":
         """Load config from a YAML file. Returns a new frozen GlobalConfig instance."""
@@ -41,6 +109,9 @@ class GlobalConfig:
             raise yaml.YAMLError(f"Invalid YAML in {config_path}") from exc
         if data is None:
             data = {}
+        if not isinstance(data, dict):
+            raise ValueError(f"Top-level YAML in {config_path} must be a mapping")
+        data = cls._expand_hierarchical_paths(data)
         defaults = cls()
         kwargs = {}
         for f in fields(cls):
