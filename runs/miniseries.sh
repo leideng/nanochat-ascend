@@ -5,21 +5,18 @@
 # Example: ./miniseries.sh jan11
 # Default series name is today's date (e.g., jan11)
 
-export OMP_NUM_THREADS=1
-export NANOCHAT_BASE_DIR="$HOME/.cache/nanochat"
-mkdir -p $NANOCHAT_BASE_DIR
+set -e
+source runs/set_env.sh
 
 # Setup (skip with SKIP_SETUP=1)
 if [ -z "$SKIP_SETUP" ]; then
-    # uv
-    command -v uv &> /dev/null || curl -LsSf https://astral.sh/uv/install.sh | sh
     [ -d ".venv" ] || uv venv
-    uv sync --extra gpu
+    uv sync --extra npu
     source .venv/bin/activate
 
-    # Tokenizer, download 1000 shards for pretraining
-    # (probably this can be reduced but it's tricky to determine the exact right number, TODO).
-    python -m nanochat.dataset -n 1000
+    #download the dataset
+    python -m nanochat.dataset
+    # train the tokenizer
     python -m scripts.tok_train --max-chars=2000000000 --vocab-size=32768
 else
     source .venv/bin/activate
