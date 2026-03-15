@@ -49,7 +49,7 @@ def test_base_train_main_runs_tiny_cpu_smoke(tmp_path, monkeypatch, dummy_tokeni
             "--depth",
             "2",
             "--aspect-ratio",
-            "8",
+            "16",
             "--head-dim",
             "8",
             "--max-seq-len",
