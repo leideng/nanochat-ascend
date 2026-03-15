@@ -19,7 +19,7 @@ pytestmark = [
 
 def test_base_train_npu_medium_smoke():
     if "NANOCHAT_CONFIG" not in os.environ:
-        pytest.skip("Set NANOCHAT_CONFIG to an Ascend-ready config before running NPU tests")
+        pytest.skip("Run 'source runs/set_env.sh' before NPU smoke tests")
 
     base_train.main(
         [

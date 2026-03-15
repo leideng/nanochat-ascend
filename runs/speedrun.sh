@@ -16,8 +16,7 @@ set -e
 # Default intermediate artifacts directory is in ~/.cache/nanochat
 export OMP_NUM_THREADS=1
 
-export NANOCHAT_CONFIG="configs/local.yaml"
-echo "NANOCHAT_CONFIG: $NANOCHAT_CONFIG"
+source runs/set_env.sh
 
 # -----------------------------------------------------------------------------
 # Python venv setup with uv

@@ -13,8 +13,7 @@
 # exit on error
 set -e
 
-export NANOCHAT_CONFIG="configs/local.yaml"
-echo "NANOCHAT_CONFIG: $NANOCHAT_CONFIG"
+source runs/set_env.sh
 
 command -v uv &> /dev/null || curl -LsSf https://astral.sh/uv/install.sh | sh
 [ -d ".venv" ] || uv venv

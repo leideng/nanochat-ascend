@@ -1,3 +1,6 @@
+import pytest
+
+from nanochat.common import get_global_config
 from nanochat.global_config import GlobalConfig
 
 
@@ -52,3 +55,16 @@ enforce_eager: true
     assert config.chatrl_eval_dir == "out/rl_eval"
     assert config.tokenizer_dir == "out/tokenizer"
     assert config.report_dir == "out/report"
+def test_get_global_config_uses_nanachat_config_env(monkeypatch):
+    monkeypatch.setenv("NANOCHAT_CONFIG", "configs/global.yaml")
+
+    config = get_global_config()
+
+    assert config == GlobalConfig.load_from_yaml("configs/global.yaml")
+
+
+def test_get_global_config_requires_nanachat_config_env(monkeypatch):
+    monkeypatch.delenv("NANOCHAT_CONFIG", raising=False)
+
+    with pytest.raises(ValueError, match="NANOCHAT_CONFIG environment variable is not set"):
+        get_global_config()

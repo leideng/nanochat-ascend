@@ -18,7 +18,7 @@ pytestmark = [
 
 def test_base_eval_npu_medium_smoke():
     if "NANOCHAT_CONFIG" not in os.environ:
-        pytest.skip("Set NANOCHAT_CONFIG to an Ascend-ready config before running NPU tests")
+        pytest.skip("Run 'source runs/set_env.sh' before NPU smoke tests")
 
     model_tag = os.environ.get("NANOCHAT_TEST_MODEL_TAG")
     if not model_tag:

@@ -48,13 +48,14 @@ logger = logging.getLogger(__name__)
 
 
 def get_global_config():
-    """Get the global config from the environment variable NANOCHAT_CONFIG"""
-    if "NANOCHAT_CONFIG" in os.environ:
-        config_path = os.environ.get("NANOCHAT_CONFIG")
-        print(f"Loading global config from {config_path}")
-        return GlobalConfig.load_from_yaml(config_path)
-    else:
-        raise ValueError("NANOCHAT_CONFIG environment variable is not set")
+    """Get the global config from the NANOCHAT_CONFIG environment variable."""
+    config_path = os.environ.get("NANOCHAT_CONFIG")
+    if not config_path:
+        raise ValueError(
+            "NANOCHAT_CONFIG environment variable is not set. "
+            "Run 'source runs/set_env.sh' from the repo root first."
+        )
+    return GlobalConfig.load_from_yaml(config_path)
 
 
 def print0(s="",**kwargs):

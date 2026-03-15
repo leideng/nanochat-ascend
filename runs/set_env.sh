@@ -1,23 +1,18 @@
-# This script sets the NANOCHAT_CONFIG environment variable
-# and prints the value of the environment variable
+# This script sets the shell environment for nanochat runs.
 #
 # Usage:
 # source runs/set_env.sh
 #
-# This script is used to set the global environment variable
-#
-
 if [[ -n "${BASH_SOURCE[0]:-}" && "${BASH_SOURCE[0]}" == "${0}" ]]; then
   echo "Usage: source runs/set_env.sh"
-  echo "Warning: do not execute this script (i.e. bash runs/set_env.sh), but source it"
+  echo "Warning: do not execute this script with bash; source it so the exports persist"
   exit 1
 fi
 
 export OMP_NUM_THREADS=1
-export NANOCHAT_CONFIG="configs/local.yaml"
+export NANOCHAT_CONFIG="configs/global.yaml"
 
 echo "OMP_NUM_THREADS is set to be: $OMP_NUM_THREADS"
-echo "NANOCHAT_CONFI is set to be: $NANOCHAT_CONFIG"
-
-echo "Please run \"echo \$NANOCHAT_CONFIG\" in your terminal to set the NANOCHAT_CONFIG environment variable"
+echo "NANOCHAT_CONFIG is set to be: $NANOCHAT_CONFIG"
+echo "All runtime config is loaded from configs/global.yaml"
 echo "Please run \"echo \$OMP_NUM_THREADS\" in your terminal to set the OMP_NUM_THREADS environment variable"

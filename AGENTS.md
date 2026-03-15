@@ -29,6 +29,14 @@ Practical implications:
 
 Use `uv` for dependency and environment management.
 
+Before running any repo command that depends on config, agents and users must first run:
+
+```bash
+source runs/set_env.sh
+```
+
+This exports `NANOCHAT_CONFIG=configs/global.yaml`. Runtime config should be read from `configs/global.yaml` through that environment variable; do not rely on ad hoc config env vars.
+
 CPU machine:
 
 ```bash
@@ -43,6 +51,7 @@ uv sync --extra npu
 
 Notes:
 
+- Run `source runs/set_env.sh` from the repo root before `python -m ...`, `uv run ...`, `torchrun ...`, or pytest commands that need repo config.
 - In this repo, `uv sync` is the CPU/default setup path and is equivalent in practice to `uv sync --extra cpu`.
 - On this CPU-only machine, agents should normally use `uv sync`.
 - Agents must not assume that an NPU environment is runnable locally just because `--extra npu` can be resolved or installed elsewhere.
@@ -52,6 +61,7 @@ Notes:
 
 ```bash
 # Environment setup
+source runs/set_env.sh    # required before repo commands that read config
 uv sync                  # default sync, equivalent to the CPU setup in this repo
 uv sync --extra npu      # install with Ascend NPU dependencies on an NPU machine
 

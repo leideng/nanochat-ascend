@@ -159,7 +159,6 @@ class GlobalConfig:
     def nice_print(self):
         print("GlobalConfig:")
         print(json.dumps({f.name: getattr(self, f.name) for f in fields(self)}, indent=2))
-    
 
 
 if __name__ == "__main__":
