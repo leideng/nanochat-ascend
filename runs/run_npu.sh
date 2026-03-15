@@ -4,11 +4,11 @@
 # It is designed to run on a 16x910C Ascend NPU node (a3 server).
 
 # 1) Example launch (simplest):
-# bash runs/speedrun.sh
+# bash runs/run_npu.sh
 # 2) Example launch in a screen session (because the run takes ~3 hours):
-# screen -L -Logfile runs/speedrun.log -S speedrun bash runs/speedrun.sh
+# screen -L -Logfile runs/run_npu.log -S run_npu bash runs/run_npu.sh
 # 3) Example launch with wandb logging, but see below for setting up wandb first:
-# WANDB_RUN=speedrun screen -L -Logfile runs/speedrun.log -S speedrun bash runs/speedrun.sh
+# WANDB_RUN=run_npu screen -L -Logfile runs/run_npu.log -S run_npu bash runs/run_npu.sh
 
 # exit on error
 set -e
@@ -34,7 +34,7 @@ source .venv/bin/activate
 # 1) Make sure to first log in to wandb, e.g. run:
 #    `wandb login`
 # 2) Set the WANDB_RUN environment variable when running this script, e.g.:
-#    `WANDB_RUN=d26 bash speedrun.sh`
+#    `WANDB_RUN=d26 bash runs/run_npu.sh`
 if [ -z "$WANDB_RUN" ]; then
     # by default use "dummy" : it's handled as a special case, skips logging to wandb
     WANDB_RUN=dummy

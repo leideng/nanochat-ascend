@@ -4,7 +4,7 @@
 # This script was last updated/tuned on Jan 17, 2026.
 
 # Run as:
-# bash runs/runcpu.sh
+# bash runs/run_cpu.sh
 
 # NOTE: Training LLMs requires GPU compute and $$$. You will not get far on your CPU.
 # Think of this run as educational/fun demo, not something you should expect to work well.

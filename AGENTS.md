@@ -29,13 +29,14 @@ Practical implications:
 
 Use `uv` for dependency and environment management.
 
-Before running any repo command that depends on config, agents and users must first run:
+Before running repo commands manually that depend on config, agents and users must first run:
 
 ```bash
 source runs/set_env.sh
 ```
 
 This exports `NANOCHAT_CONFIG=configs/global.yaml`. Runtime config should be read from `configs/global.yaml` through that environment variable; do not rely on ad hoc config env vars.
+If a task uses the wrapper scripts under `runs/`, those scripts may source `runs/set_env.sh` internally.
 
 CPU machine:
 
@@ -52,6 +53,7 @@ uv sync --extra npu
 Notes:
 
 - Run `source runs/set_env.sh` from the repo root before `python -m ...`, `uv run ...`, `torchrun ...`, or pytest commands that need repo config.
+- Prefer the `runs/*.sh` wrappers for common repo workflows unless the task specifically requires invoking modules directly.
 - In this repo, `uv sync` is the CPU/default setup path and is equivalent in practice to `uv sync --extra cpu`.
 - On this CPU-only machine, agents should normally use `uv sync`.
 - Agents must not assume that an NPU environment is runnable locally just because `--extra npu` can be resolved or installed elsewhere.
@@ -60,39 +62,28 @@ Notes:
 ## Common Commands
 
 ```bash
-# Environment setup
-source runs/set_env.sh    # required before repo commands that read config
-uv sync                  # default sync, equivalent to the CPU setup in this repo
-uv sync --extra npu      # install with Ascend NPU dependencies on an NPU machine
+# Environment setup for manual commands
+source runs/set_env.sh
+uv sync
+uv sync --extra npu
 
-# All scripts run as modules from the repo root
-# Tokenizer
-python -m scripts.tok_train --max-chars=2000000
-python -m scripts.tok_eval
+# Common wrapper scripts
+bash runs/prepare_dataset.sh
+bash runs/run_tok_train.sh
+bash runs/run_base_train.sh
+bash runs/run_base_eval.sh
+bash runs/run_sft.sh
+bash runs/run_cpu.sh
 
-# Pre-training smoke test on CPU only
-NANOCHAT_ENFORCE_EAGER=1 python -m scripts.base_train --device-type=cpu --depth=6 --max-seq-len=64 --device-batch-size=1 --total-batch-size=8 --num-iterations=2
+# Full NPU pipeline, only on Ascend hardware
+bash runs/run_npu.sh
 
-# Pre-training on Ascend NPU, do not execute on this machine
-torchrun --nproc_per_node=8 -m scripts.base_train
-
-# Evaluation on CPU only
-python -m scripts.base_eval --device-type=cpu --device-batch-size=1 --split-tokens=1024
-python -m scripts.chat_eval --device-type=cpu -a ARC-Easy
-
-# SFT and RL
-python -m scripts.chat_sft --device-type=cpu --num-iterations=2
-python -m scripts.chat_rl --device-type=cpu
-
-# Inference
-python -m scripts.chat_cli --device-type=cpu -p "What is the capital of France?"
-python -m scripts.chat_web --device-type=cpu
-
-# Dataset inspection
+# Direct module examples when wrappers are not appropriate
 python -m nanochat.dataset
-
-# Full CPU demo pipeline
-bash runs/runcpu.sh
+python -m scripts.tok_train --max-chars=2000000
+python -m scripts.base_train --device-type=cpu --depth=6 --max-seq-len=64 --device-batch-size=1 --total-batch-size=8 --num-iterations=2
+python -m scripts.base_eval --device-type=cpu --device-batch-size=1 --split-tokens=1024
+python -m scripts.chat_cli --device-type=cpu -p "What is the capital of France?"
 ```
 
 Pytest is configured for the repo under `tests/`. Use `uv run pytest` to run local tests after syncing the environment.
