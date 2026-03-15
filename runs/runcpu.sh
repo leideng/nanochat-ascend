@@ -15,7 +15,12 @@ set -e
 
 source runs/set_env.sh
 
+# create a .venv local virtual environment (if it doesn't exist)
+[ -d ".venv" ] || uv venv
+
+# install the repo dependencies
 uv sync --extra cpu
+
 source .venv/bin/activate
 
 if [ -z "$WANDB_RUN" ]; then
