@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# See speedrun.sh for more comments
+# See runs/run_npu.sh for more comments
 # Usage: ./miniseries.sh [series_name]
 # Example: ./miniseries.sh jan11
 # Default series name is today's date (e.g., jan11)
