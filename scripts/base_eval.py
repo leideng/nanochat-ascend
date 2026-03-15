@@ -166,7 +166,7 @@ def evaluate_core(model, tokenizer, device, max_per_task=-1):
 # -----------------------------------------------------------------------------
 # Main
 
-def main():
+def main(argv=None):
     parser = argparse.ArgumentParser(description="Base model evaluation")
     parser.add_argument('--eval', type=str, default='core,bpb,sample', help='Comma-separated evaluations to run: core,bpb,sample (default: all)')
     parser.add_argument('--hf-path', type=str, default=None, help='HuggingFace model path (e.g. openai-community/gpt2-xl)')
@@ -176,7 +176,7 @@ def main():
     parser.add_argument('--device-batch-size', type=int, default=32, help='Per-device batch size for BPB evaluation')
     parser.add_argument('--split-tokens', type=int, default=40*524288, help='Number of tokens to evaluate per split for BPB')
     parser.add_argument('--device-type', type=str, default='', help='npu|cpu (empty = autodetect)')
-    args = parser.parse_args()
+    args = parser.parse_args(argv)
 
     # Parse evaluation modes
     eval_modes = set(mode.strip() for mode in args.eval.split(','))

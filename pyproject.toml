@@ -31,4 +31,13 @@ url = "https://download.pytorch.org/whl/cpu"
 [dependency-groups]
 dev = [
     "ipython>=9.10.0",
+    "pytest",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+markers = [
+    "meta: shape-only tests that run on PyTorch meta device",
+    "cpu: very small CPU execution tests",
+    "npu: Ascend NPU tests intended for manual execution on NPU machines",
 ]
