@@ -1,5 +1,12 @@
 #!/bin/bash
 
+set -e
+
+source runs/set_env.sh
+
+[ -d ".venv" ] || uv venv
+source .venv/bin/activate
+
 # Evaluate the model
 python -m scripts.base_eval \
     --model-tag="d4-test" \

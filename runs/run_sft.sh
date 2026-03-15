@@ -1,5 +1,12 @@
 #!/bin/bash
 
+set -e
+
+source runs/set_env.sh
+
+[ -d ".venv" ] || uv venv
+source .venv/bin/activate
+
 WANDB_RUN=dummy
 
 python -m scripts.chat_sft \

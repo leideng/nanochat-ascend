@@ -131,15 +131,21 @@ def compute_init(device_type="npu"): # npu|cpu
     if device_type == "npu":
         torch.backends.fp32_precision = "tf32" # uses tf32 instead of fp32 for matmuls
 
-    # Distributed setup: Distributed Data Parallel (DDP), optional, and requires NPU
+    # Distributed setup: Distributed Data Parallel (DDP), optional.
     is_ddp_requested, ddp_rank, ddp_local_rank, ddp_world_size = get_dist_info()
-    if is_ddp_requested and device_type == "npu":
-        device = torch.device("npu", ddp_local_rank)
-        torch.npu.set_device(device)  # make npu default to this device
-        dist.init_process_group(backend="hccl", rank=ddp_rank, world_size=ddp_world_size, device_id=device)
-        dist.barrier()
+    if device_type == "npu":
+        if is_ddp_requested:
+            device = torch.device("npu", ddp_local_rank)
+            torch.npu.set_device(device)  # make npu default to this device
+            dist.init_process_group(backend="hccl", rank=ddp_rank, world_size=ddp_world_size, device_id=device)
+            dist.barrier()
+        else:
+            device = torch.device("npu")
     else:
-        device = torch.device(device_type) # cpu
+        device = torch.device("cpu")
+        if is_ddp_requested:
+            dist.init_process_group(backend="gloo", rank=ddp_rank, world_size=ddp_world_size)
+            dist.barrier()
 
     if ddp_rank == 0:
         logger.info(f"Distributed world size: {ddp_world_size}")
