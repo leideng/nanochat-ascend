@@ -52,20 +52,31 @@ class GlobalConfig:
             if not isinstance(dataset_cfg, dict):
                 raise ValueError("Config key dataset must be a mapping")
             dataset_root = dataset_cfg.get("root", "")
-            dataset_keys = {
+            top_level_dataset_keys = {
                 "pretrain": "pretrain_dataset",
-                "sft": "sft_dataset",
-                "simple_spelling": "simple_spelling_dataset",
                 "eval": "eval_dataset",
-                "allenai_arc": "allenai_arc_dataset",
-                "openai_gsm8k": "openai_gsm8k_dataset",
-                "openai_humaneval": "openai_humaneval_dataset",
-                "cais_mmlu": "cais_mmlu_dataset",
-                "huggingface_tb_smol_smoltalk": "huggingface_tb_smol_smoltalk_dataset",
             }
-            for child_key, flat_key in dataset_keys.items():
+            for child_key, flat_key in top_level_dataset_keys.items():
                 if child_key in dataset_cfg:
                     expanded[flat_key] = cls._resolve_path(dataset_root, dataset_cfg[child_key])
+
+            task_cfg = dataset_cfg.get("task")
+            if task_cfg is not None:
+                if not isinstance(task_cfg, dict):
+                    raise ValueError("Config key dataset.task must be a mapping")
+                task_root = cls._resolve_path(dataset_root, task_cfg.get("root", ""))
+                task_dataset_keys = {
+                    "identity_conversations": "sft_dataset",
+                    "simple_spelling": "simple_spelling_dataset",
+                    "allenai_arc": "allenai_arc_dataset",
+                    "openai_gsm8k": "openai_gsm8k_dataset",
+                    "openai_humaneval": "openai_humaneval_dataset",
+                    "cais_mmlu": "cais_mmlu_dataset",
+                    "huggingface_tb_smol_smoltalk": "huggingface_tb_smol_smoltalk_dataset",
+                }
+                for child_key, flat_key in task_dataset_keys.items():
+                    if child_key in task_cfg:
+                        expanded[flat_key] = cls._resolve_path(task_root, task_cfg[child_key])
 
         checkpoint_cfg = data.get("checkpoint")
         if checkpoint_cfg is not None:

@@ -9,14 +9,16 @@ device: cpu
 dataset:
   root: data
   pretrain: pretrain/sample
-  sft: sft/identity.jsonl
-  simple_spelling: sft/words.txt
   eval: eval
-  allenai_arc: ai2_arc
-  openai_gsm8k: gsm8k
-  openai_humaneval: humaneval
-  cais_mmlu: mmlu
-  huggingface_tb_smol_smoltalk: smol-smoltalk
+  task:
+    root: task
+    identity_conversations: identity.jsonl
+    simple_spelling: words.txt
+    allenai_arc: ai2_arc
+    openai_gsm8k: gsm8k
+    openai_humaneval: humaneval
+    cais_mmlu: mmlu
+    huggingface_tb_smol_smoltalk: smol-smoltalk
 checkpoint:
   root: ckpts
   base: base
@@ -35,8 +37,11 @@ enforce_eager: true
     config = GlobalConfig.load_from_yaml(str(config_path))
 
     assert config.pretrain_dataset == "data/pretrain/sample"
-    assert config.sft_dataset == "data/sft/identity.jsonl"
+    assert config.sft_dataset == "data/task/identity.jsonl"
+    assert config.simple_spelling_dataset == "data/task/words.txt"
     assert config.eval_dataset == "data/eval"
+    assert config.allenai_arc_dataset == "data/task/ai2_arc"
+    assert config.openai_gsm8k_dataset == "data/task/gsm8k"
     assert config.output_dir == "out"
     assert config.base_checkpoints_dir == "ckpts/base"
     assert config.chatsft_checkpoints_dir == "ckpts/sft"

@@ -2,14 +2,16 @@ device: cpu
 dataset:
   root: .cache/dataset
   pretrain: pretrain/fineweb-edu-100b-shuffle-sample
-  sft: sft/identity_conversations.jsonl # source: https://karpathy-public.s3.us-west-2.amazonaws.com/identity_conversations.jsonl
-  simple_spelling: sft/words_alpha.txt # source: https://raw.githubusercontent.com/dwyl/english-words/refs/heads/master/words_alpha.txt
   eval: eval # source: https://karpathy-public.s3.us-west-2.amazonaws.com/eval_bundle.zip
-  allenai_arc: ai2_arc
-  openai_gsm8k: gsm8k
-  openai_humaneval: humaneval
-  cais_mmlu: mmlu
-  huggingface_tb_smol_smoltalk: smol-smoltalk
+  task:
+    root: task
+    identity_conversations: identity_conversations.jsonl # source: https://karpathy-public.s3.us-west-2.amazonaws.com/identity_conversations.jsonl
+    simple_spelling: words_alpha.txt # source: https://raw.githubusercontent.com/dwyl/english-words/refs/heads/master/words_alpha.txt
+    allenai_arc: ai2_arc
+    openai_gsm8k: gsm8k
+    openai_humaneval: humaneval
+    cais_mmlu: mmlu
+    huggingface_tb_smol_smoltalk: smol-smoltalk
 checkpoint:
   root: .cache/checkpoint
   base: base_checkpoints
