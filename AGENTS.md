@@ -148,10 +148,12 @@ A skill is a local instruction bundle stored in a `SKILL.md` file under `skills/
 
 - **meta-test** - Use for shape-only validation, meta-device model construction, tensor shape checks, and checkpoint/model wiring that should not allocate real tensors. File: `skills/meta-test/SKILL.md`
 - **cpu-test** - Use for tiny real-execution smoke tests on CPU, especially when validating forward passes, training steps, loaders, checkpoints, or CLI entry points without NPU access. File: `skills/cpu-test/SKILL.md`
+- **data-view** - Use when explaining how a dataset is structured, where it is loaded, and how it is transformed for pretraining, CORE eval, chat SFT, chat eval, or chat RL. File: `skills/data-view/SKILL.md`
 
 ### How to use skills
 
 - Use `meta-test` when the task is about shapes, initialization, meta tensors, or structure validation without real execution.
 - Use `cpu-test` when the task needs a real run but can be reduced to a tiny CPU-only smoke test.
+- Use `data-view` when the task is to understand dataset format, sample records, config dataset paths, or code paths consuming the datasets.
 - Skills are repo-specific guardrails. They do not override the machine constraint that NPU code must not be executed here.
 - If an NPU-only issue cannot be resolved locally, ask the user to run the relevant command on Ascend hardware and paste the output.

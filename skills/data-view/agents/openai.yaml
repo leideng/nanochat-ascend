@@ -1,0 +1,4 @@
+interface:
+  display_name: "Data View"
+  short_description: "Understand repo datasets and their usage"
+  default_prompt: "Explain how a dataset in nanochat-ascend is structured and where it is used."
