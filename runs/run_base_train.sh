@@ -13,7 +13,7 @@ PARALLEL_TRAIN="${PARALLEL_TRAIN:-0}"
 
 WANDB_RUN=dummy
 
-if [ $PARALLEL_TRAIN -eq 1 ]; then # parallel training
+if [ $PARALLEL_TRAIN -eq 1 ]; then # (TODO) parallel training still not working. comming later
     NUM_CPU=$(lscpu | grep "^CPU(s):" | awk '{print $2}')
     echo "NUM_CPU in this machine is: $NUM_CPU"
     #echo "Using half of the CPUs for training: $((NUM_CPU / 2))"
