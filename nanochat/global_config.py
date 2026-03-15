@@ -3,18 +3,26 @@ Configuration for the nanochat-ascend model.
 """
 
 from dataclasses import dataclass, fields
-import os
-import yaml
 import json
+import os
+
+import torch
+import yaml
+
+
+def _autodetect_config_device() -> str:
+    if hasattr(torch, "npu") and torch.npu.is_available():
+        return "npu"
+    return "cpu"
 
 @dataclass(frozen=True)
 class GlobalConfig:
-    device: str = "cpu"
+    device: str = _autodetect_config_device()
     enforce_eager: bool = True
 
     ## dataset paths
     pretrain_dataset: str = ""
-    sft_dataset: str = ""
+    identity_conversations_dataset: str = ""
     simple_spelling_dataset: str = ""
     eval_dataset: str = ""
     allenai_arc_dataset: str = ""
@@ -66,7 +74,7 @@ class GlobalConfig:
                     raise ValueError("Config key dataset.task must be a mapping")
                 task_root = cls._resolve_path(dataset_root, task_cfg.get("root", ""))
                 task_dataset_keys = {
-                    "identity_conversations": "sft_dataset",
+                    "identity_conversations": "identity_conversations_dataset",
                     "simple_spelling": "simple_spelling_dataset",
                     "allenai_arc": "allenai_arc_dataset",
                     "openai_gsm8k": "openai_gsm8k_dataset",

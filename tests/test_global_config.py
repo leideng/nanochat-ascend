@@ -36,7 +36,7 @@ enforce_eager: true
     config = GlobalConfig.load_from_yaml(str(config_path))
 
     assert config.pretrain_dataset == "data/pretrain/sample"
-    assert config.sft_dataset == "data/task/identity.jsonl"
+    assert config.identity_conversations_dataset == "data/task/identity.jsonl"
     assert config.simple_spelling_dataset == "data/task/words.txt"
     assert config.eval_dataset == "data/eval"
     assert config.allenai_arc_dataset == "data/task/ai2_arc"

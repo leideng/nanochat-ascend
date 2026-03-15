@@ -75,7 +75,7 @@ Usage:
 ## Identity Conversations
 
 Configured path:
-- `sft_dataset`
+- `identity_conversations_dataset`
 
 Primary consumers:
 - `tasks/customjson.py`

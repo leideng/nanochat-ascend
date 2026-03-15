@@ -49,15 +49,15 @@ def download_url_datasets():
     Download the datasets from the URL and save them to the local cache directory.
 
     1. eval_dataset: .cache/dataset/eval  #source: https://karpathy-public.s3.us-west-2.amazonaws.com/eval_bundle.zip
-    2. sft_dataset: .cache/dataset/sft/identity_conversations.jsonl #source: https://karpathy-public.s3.us-west-2.amazonaws.com/identity_conversations.jsonl
+    2. identity_conversations_dataset: .cache/dataset/task/identity_conversations.jsonl #source: https://karpathy-public.s3.us-west-2.amazonaws.com/identity_conversations.jsonl
     3. simple_spelling_dataset: .cache/dataset/sft/words_alpha.txt  #source:https://raw.githubusercontent.com/dwyl/english-words/refs/heads/master/words_alpha.txt
     """
     #just curl down the files and save them to the local cache directory.
     eval_dataset_url = "https://karpathy-public.s3.us-west-2.amazonaws.com/eval_bundle.zip"
-    sft_dataset_url = "https://karpathy-public.s3.us-west-2.amazonaws.com/identity_conversations.jsonl"
+    identity_conversations_dataset_url = "https://karpathy-public.s3.us-west-2.amazonaws.com/identity_conversations.jsonl"
     simple_spelling_dataset_url = "https://raw.githubusercontent.com/dwyl/english-words/refs/heads/master/words_alpha.txt"
     eval_dataset_path = get_global_config().eval_dataset
-    sft_dataset_path = get_global_config().sft_dataset
+    identity_conversations_dataset_path = get_global_config().identity_conversations_dataset
     simple_spelling_dataset_path = get_global_config().simple_spelling_dataset
 
     if not os.path.exists(eval_dataset_path):
@@ -66,12 +66,12 @@ def download_url_datasets():
         os.system(f"curl -o {eval_dataset_path} {eval_dataset_url}")
     else:
         print(f"Eval dataset already exists at {eval_dataset_path}")
-    if not os.path.exists(sft_dataset_path):
-        os.makedirs(os.path.dirname(sft_dataset_path), exist_ok=True)
-        print(f"Downloading sft dataset from {sft_dataset_url} to {sft_dataset_path}...")
-        os.system(f"curl -o {sft_dataset_path} {sft_dataset_url}")
+    if not os.path.exists(identity_conversations_dataset_path):
+        os.makedirs(os.path.dirname(identity_conversations_dataset_path), exist_ok=True)
+        print(f"Downloading identity conversations dataset from {identity_conversations_dataset_url} to {identity_conversations_dataset_path}...")
+        os.system(f"curl -o {identity_conversations_dataset_path} {identity_conversations_dataset_url}")
     else:
-        print(f"Sft dataset already exists at {sft_dataset_path}")
+        print(f"Identity conversations dataset already exists at {identity_conversations_dataset_path}")
     if not os.path.exists(simple_spelling_dataset_path):
         os.makedirs(os.path.dirname(simple_spelling_dataset_path), exist_ok=True)
         print(f"Downloading simple spelling dataset from {simple_spelling_dataset_url} to {simple_spelling_dataset_path}...")

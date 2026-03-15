@@ -66,7 +66,7 @@ class CustomJSON(Task):
 
 if __name__ == "__main__":
     from nanochat.common import get_global_config
-    filepath = get_global_config().sft_dataset
+    filepath = get_global_config().identity_conversations_dataset
     if not os.path.exists(filepath):
         print(f"File {filepath} does not exist")
         print("Please run the following command to download the file:")
