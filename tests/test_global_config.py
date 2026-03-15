@@ -26,6 +26,8 @@ checkpoint:
 output:
   root: out
   base_eval: eval
+  chatsft_eval: sft_eval
+  chatrl_eval: rl_eval
   tokenizer: tokenizer
   report: report
 enforce_eager: true
@@ -46,5 +48,7 @@ enforce_eager: true
     assert config.chatsft_checkpoints_dir == "ckpts/sft"
     assert config.chatrl_checkpoints_dir == "ckpts/rl"
     assert config.base_eval_dir == "out/eval"
+    assert config.chatsft_eval_dir == "out/sft_eval"
+    assert config.chatrl_eval_dir == "out/rl_eval"
     assert config.tokenizer_dir == "out/tokenizer"
     assert config.report_dir == "out/report"

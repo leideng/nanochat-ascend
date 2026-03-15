@@ -37,6 +37,8 @@ class GlobalConfig:
     chatsft_checkpoints_dir: str = ""
     chatrl_checkpoints_dir: str = ""
     base_eval_dir: str = ""
+    chatsft_eval_dir: str = ""
+    chatrl_eval_dir: str = ""
     tokenizer_dir: str = ""
     report_dir: str = ""
 
@@ -110,6 +112,8 @@ class GlobalConfig:
 
             output_keys = {
                 "base_eval": "base_eval_dir",
+                "chatsft_eval": "chatsft_eval_dir",
+                "chatrl_eval": "chatrl_eval_dir",
                 "tokenizer": "tokenizer_dir",
                 "report": "report_dir",
             }

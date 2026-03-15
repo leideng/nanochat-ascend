@@ -19,6 +19,8 @@ checkpoint:
 output:
   root: .cache/output
   base_eval: base_eval
+  chatsft_eval: chatsft_eval
+  chatrl_eval: chatrl_eval
   tokenizer: tokenizer
   report: report
 enforce_eager: true # disable torch.compile
