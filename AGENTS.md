@@ -116,3 +116,19 @@ The codebase has two layers: **nanochat/** (core library) and **scripts/** (entr
 - **Meta-first construction**: training code already uses `with torch.device("meta")` and `to_empty()` for shape-first model initialization.
 - **Checkpoints**: `model_{step:06d}.pt`, `meta_{step:06d}.json`, `optim_{step:06d}_rank{rank}.pt` in base dir.
 - **Module execution**: All scripts run via `python -m scripts.<name>` or `python -m nanochat.<name>`, not as standalone files.
+
+## Skills
+
+A skill is a local instruction bundle stored in a `SKILL.md` file under `skills/`.
+
+### Available skills
+
+- **meta-test** - Use for shape-only validation, meta-device model construction, tensor shape checks, and checkpoint/model wiring that should not allocate real tensors. File: `skills/meta-test/SKILL.md`
+- **cpu-test** - Use for tiny real-execution smoke tests on CPU, especially when validating forward passes, training steps, loaders, checkpoints, or CLI entry points without NPU access. File: `skills/cpu-test/SKILL.md`
+
+### How to use skills
+
+- Use `meta-test` when the task is about shapes, initialization, meta tensors, or structure validation without real execution.
+- Use `cpu-test` when the task needs a real run but can be reduced to a tiny CPU-only smoke test.
+- Skills are repo-specific guardrails. They do not override the machine constraint that NPU code must not be executed here.
+- If an NPU-only issue cannot be resolved locally, ask the user to run the relevant command on Ascend hardware and paste the output.
