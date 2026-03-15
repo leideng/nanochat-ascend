@@ -44,6 +44,7 @@ class GlobalConfig:
     def _expand_hierarchical_paths(cls, data: dict) -> dict:
         expanded = dict(data)
         expanded.pop("dataset", None)
+        expanded.pop("checkpoint", None)
         expanded.pop("output", None)
 
         dataset_cfg = data.get("dataset")
@@ -66,6 +67,20 @@ class GlobalConfig:
                 if child_key in dataset_cfg:
                     expanded[flat_key] = cls._resolve_path(dataset_root, dataset_cfg[child_key])
 
+        checkpoint_cfg = data.get("checkpoint")
+        if checkpoint_cfg is not None:
+            if not isinstance(checkpoint_cfg, dict):
+                raise ValueError("Config key checkpoint must be a mapping")
+            checkpoint_root = checkpoint_cfg.get("root", "")
+            checkpoint_keys = {
+                "base": "base_checkpoints_dir",
+                "chatsft": "chatsft_checkpoints_dir",
+                "chatrl": "chatrl_checkpoints_dir",
+            }
+            for child_key, flat_key in checkpoint_keys.items():
+                if child_key in checkpoint_cfg:
+                    expanded[flat_key] = cls._resolve_path(checkpoint_root, checkpoint_cfg[child_key])
+
         output_cfg = data.get("output")
         if output_cfg is not None:
             if not isinstance(output_cfg, dict):
@@ -82,20 +97,6 @@ class GlobalConfig:
             for child_key, flat_key in output_keys.items():
                 if child_key in output_cfg:
                     expanded[flat_key] = cls._resolve_path(output_root, output_cfg[child_key])
-
-            checkpoints_cfg = output_cfg.get("checkpoints")
-            if checkpoints_cfg is not None:
-                if not isinstance(checkpoints_cfg, dict):
-                    raise ValueError("Config key output.checkpoints must be a mapping")
-                checkpoints_root = cls._resolve_path(output_root, checkpoints_cfg.get("root", ""))
-                checkpoint_keys = {
-                    "base": "base_checkpoints_dir",
-                    "chatsft": "chatsft_checkpoints_dir",
-                    "chatrl": "chatrl_checkpoints_dir",
-                }
-                for child_key, flat_key in checkpoint_keys.items():
-                    if child_key in checkpoints_cfg:
-                        expanded[flat_key] = cls._resolve_path(checkpoints_root, checkpoints_cfg[child_key])
 
         return expanded
 

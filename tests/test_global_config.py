@@ -17,13 +17,13 @@ dataset:
   openai_humaneval: humaneval
   cais_mmlu: mmlu
   huggingface_tb_smol_smoltalk: smol-smoltalk
+checkpoint:
+  root: ckpts
+  base: base
+  chatsft: sft
+  chatrl: rl
 output:
   root: out
-  checkpoints:
-    root: ckpts
-    base: base
-    chatsft: sft
-    chatrl: rl
   base_eval: eval
   tokenizer: tokenizer
   report: report
@@ -38,9 +38,9 @@ enforce_eager: true
     assert config.sft_dataset == "data/sft/identity.jsonl"
     assert config.eval_dataset == "data/eval"
     assert config.output_dir == "out"
-    assert config.base_checkpoints_dir == "out/ckpts/base"
-    assert config.chatsft_checkpoints_dir == "out/ckpts/sft"
-    assert config.chatrl_checkpoints_dir == "out/ckpts/rl"
+    assert config.base_checkpoints_dir == "ckpts/base"
+    assert config.chatsft_checkpoints_dir == "ckpts/sft"
+    assert config.chatrl_checkpoints_dir == "ckpts/rl"
     assert config.base_eval_dir == "out/eval"
     assert config.tokenizer_dir == "out/tokenizer"
     assert config.report_dir == "out/report"

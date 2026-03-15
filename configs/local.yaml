@@ -10,13 +10,13 @@ dataset:
   openai_humaneval: humaneval
   cais_mmlu: mmlu
   huggingface_tb_smol_smoltalk: smol-smoltalk
+checkpoint:
+  root: .cache/checkpoint
+  base: base_checkpoints
+  chatsft: chatsft_checkpoints
+  chatrl: chatrl_checkpoints
 output:
   root: .cache/output
-  checkpoints:
-    root: .
-    base: base_checkpoints
-    chatsft: chatsft_checkpoints
-    chatrl: chatrl_checkpoints
   base_eval: base_eval
   tokenizer: tokenizer
   report: report
