@@ -2,10 +2,9 @@ from nanochat.global_config import GlobalConfig
 
 
 def test_load_from_yaml_supports_hierarchical_paths(tmp_path):
-    config_path = tmp_path / "local.yaml"
+    config_path = tmp_path / "global.yaml"
     config_path.write_text(
         """
-device: cpu
 dataset:
   root: data
   pretrain: pretrain/sample

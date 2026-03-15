@@ -153,7 +153,7 @@ class GlobalConfig:
 if __name__ == "__main__":
     print(f"{'='*50} before loading {'='*50}")
     GlobalConfig().nice_print()
-    global_config = GlobalConfig.load_from_yaml("configs/local.yaml")
+    global_config = GlobalConfig.load_from_yaml("configs/global.yaml")
     print(f"{'='*50} after loading {'='*50}")
     global_config.nice_print()
     

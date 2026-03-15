@@ -1,4 +1,3 @@
-device: cpu
 dataset:
   root: .cache/dataset
   pretrain: pretrain/fineweb-edu-100b-shuffle-sample

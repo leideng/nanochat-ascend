@@ -15,7 +15,7 @@ Use this skill to answer dataset questions in `nanochat-ascend` precisely. Focus
 
 ## Workflow
 
-1. Start from the configured dataset path in `configs/local.yaml` or from the user-provided sample.
+1. Start from the configured dataset path in `configs/global.yaml` or from the user-provided sample.
 2. Distinguish between:
    - base pretraining data
    - CORE/base-eval benchmark data
