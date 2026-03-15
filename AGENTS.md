@@ -1,4 +1,4 @@
-# CLAUDE.md
+# AGENTS.md
 
 This file provides guidance to coding agents working in this repository.
 
@@ -25,12 +25,35 @@ Practical implications:
 - Prefer meta-device construction for model-shape checks when a forward or training step is unnecessary.
 - Do not run `torchrun` NPU launch commands locally.
 
+## Environment Setup
+
+Use `uv` for dependency and environment management.
+
+CPU machine:
+
+```bash
+uv sync
+```
+
+Ascend NPU machine:
+
+```bash
+uv sync --extra npu
+```
+
+Notes:
+
+- In this repo, `uv sync` is the CPU/default setup path and is equivalent in practice to `uv sync --extra cpu`.
+- On this CPU-only machine, agents should normally use `uv sync`.
+- Agents must not assume that an NPU environment is runnable locally just because `--extra npu` can be resolved or installed elsewhere.
+- If the lockfile or dependency graph changes, prefer updating it with `uv lock` and then syncing with the appropriate `uv sync --extra ...` command for the target machine.
+
 ## Common Commands
 
 ```bash
 # Environment setup
-uv sync                  # install dependencies
-uv sync --extra cpu      # install with CPU-only PyTorch
+uv sync                  # default sync, equivalent to the CPU setup in this repo
+uv sync --extra npu      # install with Ascend NPU dependencies on an NPU machine
 
 # All scripts run as modules from the repo root
 # Tokenizer
@@ -62,7 +85,7 @@ python -m nanochat.dataset
 bash runs/runcpu.sh
 ```
 
-No test suite, linter, or build step is configured.
+Pytest is configured for the repo under `tests/`. Use `uv run pytest` to run local tests after syncing the environment.
 
 ## Validation Policy
 
