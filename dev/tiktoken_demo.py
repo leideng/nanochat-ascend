@@ -13,6 +13,7 @@ Examples:
 from __future__ import annotations
 
 import argparse
+from collections import defaultdict
 
 import tiktoken
 from tiktoken.model import MODEL_PREFIX_TO_ENCODING, MODEL_TO_ENCODING
@@ -86,9 +87,25 @@ def print_supported_models() -> None:
 
 
 def print_supported_encodings() -> None:
+    exact_by_encoding: dict[str, list[str]] = defaultdict(list)
+    prefix_by_encoding: dict[str, list[str]] = defaultdict(list)
+
+    for model_name, encoding_name in MODEL_TO_ENCODING.items():
+        if model_name.startswith("gpt") or model_name == "gpt2":
+            exact_by_encoding[encoding_name].append(model_name)
+
+    for model_prefix, encoding_name in MODEL_PREFIX_TO_ENCODING.items():
+        if model_prefix.startswith("gpt"):
+            prefix_by_encoding[encoding_name].append(model_prefix)
+
     print("encodings:")
-    for name in sorted(tiktoken.list_encoding_names()):
-        print(f"  {name}")
+    for encoding_name in sorted(tiktoken.list_encoding_names()):
+        exact_models = sorted(exact_by_encoding[encoding_name])
+        prefix_models = sorted(prefix_by_encoding[encoding_name])
+
+        print(f"  {encoding_name}")
+        print(f"    exact_models: {exact_models if exact_models else '[]'}")
+        print(f"    prefix_models: {prefix_models if prefix_models else '[]'}")
 
 
 def check_model(model_name: str) -> None:
