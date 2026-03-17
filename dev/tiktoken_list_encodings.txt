@@ -1,0 +1,22 @@
+encodings:
+  cl100k_base
+    exact_models: ['babbage-002', 'davinci-002', 'gpt-3.5', 'gpt-3.5-turbo', 'gpt-35-turbo', 'gpt-4', 'text-embedding-3-large', 'text-embedding-3-small', 'text-embedding-ada-002']
+    prefix_models: ['ft:babbage-002', 'ft:davinci-002', 'ft:gpt-3.5-turbo', 'ft:gpt-4', 'gpt-3.5-turbo-', 'gpt-35-turbo-', 'gpt-4-']
+  gpt2
+    exact_models: ['gpt-2', 'gpt2']
+    prefix_models: []
+  o200k_base
+    exact_models: ['gpt-4.1', 'gpt-4o', 'gpt-5', 'o1', 'o3', 'o4-mini']
+    prefix_models: ['chatgpt-4o-', 'ft:gpt-4o', 'gpt-4.1-', 'gpt-4.5-', 'gpt-4o-', 'gpt-5-', 'o1-', 'o3-', 'o4-mini-']
+  o200k_harmony
+    exact_models: []
+    prefix_models: ['gpt-oss-']
+  p50k_base
+    exact_models: ['code-cushman-001', 'code-cushman-002', 'code-davinci-001', 'code-davinci-002', 'cushman-codex', 'davinci-codex', 'text-davinci-002', 'text-davinci-003']
+    prefix_models: []
+  p50k_edit
+    exact_models: ['code-davinci-edit-001', 'text-davinci-edit-001']
+    prefix_models: []
+  r50k_base
+    exact_models: ['ada', 'babbage', 'code-search-ada-code-001', 'code-search-babbage-code-001', 'curie', 'davinci', 'text-ada-001', 'text-babbage-001', 'text-curie-001', 'text-davinci-001', 'text-search-ada-doc-001', 'text-search-babbage-doc-001', 'text-search-curie-doc-001', 'text-search-davinci-doc-001', 'text-similarity-ada-001', 'text-similarity-babbage-001', 'text-similarity-curie-001', 'text-similarity-davinci-001']
+    prefix_models: []
