@@ -164,12 +164,14 @@ if val_text:
 tokenizer_results = {}
 vocab_sizes = {}
 
-for tokenizer_name in ["gpt2", "gpt4", "ours"]:
+for tokenizer_name in ["gpt2", "gpt4", "gpt5", "ours"]:
 
     if tokenizer_name == "gpt2":
         tokenizer = RustBPETokenizer.from_pretrained("gpt2") # gpt-2 base model tokenizer
     elif tokenizer_name == "gpt4":
         tokenizer = RustBPETokenizer.from_pretrained("cl100k_base") # gpt-4 base model tokenizer
+    elif tokenizer_name == "gpt5":
+        tokenizer = RustBPETokenizer.from_pretrained("o200k_base") # gpt-5 base model tokenizer
     else:
         tokenizer = get_tokenizer()
 
@@ -241,11 +243,12 @@ def print_comparison(baseline_name, baseline_results, ours_results, all_text):
 # Print comparisons
 print_comparison("GPT-2", tokenizer_results['gpt2'], tokenizer_results['ours'], all_text)
 print_comparison("GPT-4", tokenizer_results['gpt4'], tokenizer_results['ours'], all_text)
+print_comparison("GPT-5", tokenizer_results['gpt5'], tokenizer_results['ours'], all_text)
 
 # Log to report
 from nanochat.report import get_report
 lines = []
-for baseline_name in ["GPT-2", "GPT-4"]:
+for baseline_name in ["GPT-2", "GPT-4", "GPT-5"]:
     baseline_key = baseline_name.lower().replace('-', '')
     baseline_results = tokenizer_results[baseline_key]
     ours_results = tokenizer_results['ours']
