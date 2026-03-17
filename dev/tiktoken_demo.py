@@ -40,12 +40,12 @@ def build_parser() -> argparse.ArgumentParser:
     group.add_argument(
         "--list-models",
         action="store_true",
-        help="List GPT-family exact model names and prefixes recognized by the installed tiktoken",
+        help="List all exact model names and prefixes recognized by the installed tiktoken",
     )
     group.add_argument(
         "--list-encodings",
         action="store_true",
-        help="List encoding names available from the installed tiktoken package",
+        help="List encoding names and their exact/prefix model mappings from the installed tiktoken",
     )
     return parser
 
@@ -71,10 +71,8 @@ def resolve_tokenizer(args: argparse.Namespace) -> tuple[tiktoken.Encoding, str,
 
 
 def print_supported_models() -> None:
-    exact_models = sorted(
-        key for key in MODEL_TO_ENCODING if key.startswith("gpt") or key == "gpt2"
-    )
-    prefix_models = sorted(key for key in MODEL_PREFIX_TO_ENCODING if key.startswith("gpt"))
+    exact_models = sorted(MODEL_TO_ENCODING)
+    prefix_models = sorted(MODEL_PREFIX_TO_ENCODING)
 
     print("exact_models:")
     for name in exact_models:
@@ -91,12 +89,10 @@ def print_supported_encodings() -> None:
     prefix_by_encoding: dict[str, list[str]] = defaultdict(list)
 
     for model_name, encoding_name in MODEL_TO_ENCODING.items():
-        if model_name.startswith("gpt") or model_name == "gpt2":
-            exact_by_encoding[encoding_name].append(model_name)
+        exact_by_encoding[encoding_name].append(model_name)
 
     for model_prefix, encoding_name in MODEL_PREFIX_TO_ENCODING.items():
-        if model_prefix.startswith("gpt"):
-            prefix_by_encoding[encoding_name].append(model_prefix)
+        prefix_by_encoding[encoding_name].append(model_prefix)
 
     print("encodings:")
     for encoding_name in sorted(tiktoken.list_encoding_names()):
