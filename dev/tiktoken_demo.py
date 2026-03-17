@@ -7,6 +7,7 @@ Examples:
     uv run python dev/tiktoken_demo.py --model gpt-4
     uv run python dev/tiktoken_demo.py --check-model gpt-5.4
     uv run python dev/tiktoken_demo.py --list-models
+    uv run python dev/tiktoken_demo.py --list-encodings
 """
 
 from __future__ import annotations
@@ -39,6 +40,11 @@ def build_parser() -> argparse.ArgumentParser:
         "--list-models",
         action="store_true",
         help="List GPT-family exact model names and prefixes recognized by the installed tiktoken",
+    )
+    group.add_argument(
+        "--list-encodings",
+        action="store_true",
+        help="List encoding names available from the installed tiktoken package",
     )
     return parser
 
@@ -79,6 +85,12 @@ def print_supported_models() -> None:
         print(f"  {prefix}* -> {MODEL_PREFIX_TO_ENCODING[prefix]}")
 
 
+def print_supported_encodings() -> None:
+    print("encodings:")
+    for name in sorted(tiktoken.list_encoding_names()):
+        print(f"  {name}")
+
+
 def check_model(model_name: str) -> None:
     print(f"model: {model_name}")
     try:
@@ -98,6 +110,10 @@ def main() -> None:
 
     if args.list_models:
         print_supported_models()
+        return
+
+    if args.list_encodings:
+        print_supported_encodings()
         return
 
     if args.check_model:
