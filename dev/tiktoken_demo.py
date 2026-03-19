@@ -152,12 +152,16 @@ def main() -> None:
     for index, text in enumerate(samples, start=1):
         token_ids = enc.encode(text)
         decoded = enc.decode(token_ids)
+        decode_tokens_bytes = enc.decode_tokens_bytes(token_ids)
+        decode_tokens_bytes_str = "".join([b.decode("utf-8") for b in decode_tokens_bytes])
         ok = decoded == text
 
         print(f"sample {index}:")
         print(f"text: {text!r}")
         print(f"token_count: {len(token_ids)}")
         print(f"token_ids: {token_ids}")
+        print(f"decode_tokens_bytes", decode_tokens_bytes)
+        print(f"decode_tokens_bytes_str: {decode_tokens_bytes_str!r}")
         print(f"decoded: {decoded!r}")
         print(f"round_trip_ok: {ok}")
         print()
