@@ -14,12 +14,13 @@ dependencies = [
     "setuptools>=70.2.0",
     "tiktoken>=0.12.0",
     "tokenizers>=0.22.2",
-    "torch==2.9.0",
     "wandb>=0.25.0",
 ]
 
 [project.optional-dependencies]
-cpu = []
+cpu = [
+    "torch==2.9.0",
+]
 npu = [
     "attrs>=25.4.0",
     "scipy>=1.17.0",
@@ -32,16 +33,16 @@ name = "tuna"
 url = "https://pypi.tuna.tsinghua.edu.cn/simple"
 default = true
 
-[[tool.uv.index]]
-name = "pypi"
-url = "https://pypi.org/simple"
+#[[tool.uv.index]]
+#name = "pypi"
+#url = "https://pypi.org/simple"
 
-[[tool.uv.index]]
-name = "pytorch-cpu"
-url = "https://download.pytorch.org/whl/cpu"
+#[[tool.uv.index]]
+#name = "pytorch-cpu"
+#url = "https://download.pytorch.org/whl/cpu"
 
-[tool.uv.sources]
-torch = { index = "pytorch-cpu" }
+#[tool.uv.sources]
+#torch = { index = "pytorch-cpu" }
 
 [dependency-groups]
 dev = [
