@@ -511,14 +511,12 @@ dependencies = [
     { name = "setuptools" },
     { name = "tiktoken" },
     { name = "tokenizers" },
+    { name = "torch", version = "2.9.0", source = { registry = "https://download.pytorch.org/whl/cpu" }, marker = "sys_platform == 'darwin'" },
+    { name = "torch", version = "2.9.0+cpu", source = { registry = "https://download.pytorch.org/whl/cpu" }, marker = "sys_platform != 'darwin'" },
     { name = "wandb" },
 ]
 
 [package.optional-dependencies]
-cpu = [
-    { name = "torch", version = "2.9.0", source = { registry = "https://download.pytorch.org/whl/cpu" }, marker = "sys_platform == 'darwin'" },
-    { name = "torch", version = "2.9.0+cpu", source = { registry = "https://download.pytorch.org/whl/cpu" }, marker = "sys_platform != 'darwin'" },
-]
 npu = [
     { name = "attrs" },
     { name = "scipy" },
@@ -544,7 +542,7 @@ requires-dist = [
     { name = "setuptools", specifier = ">=70.2.0" },
     { name = "tiktoken", specifier = ">=0.12.0" },
     { name = "tokenizers", specifier = ">=0.22.2" },
-    { name = "torch", marker = "extra == 'cpu'", specifier = "==2.9.0", index = "https://download.pytorch.org/whl/cpu" },
+    { name = "torch", specifier = "==2.9.0", index = "https://download.pytorch.org/whl/cpu" },
     { name = "torch-npu", marker = "extra == 'npu'", specifier = "==2.9.0" },
     { name = "wandb", specifier = ">=0.25.0" },
 ]
