@@ -13,8 +13,11 @@ echo "Start to rsync dataset in .cache to A3 at $DEST"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$SCRIPT_DIR"
 
+# do not rsycn pretrain dataset;
+# manually set in a3 server
 rsync -avz --info=progress2 --human-readable \
-  ".cache" \
+  ".cache/dataset/eval" \
+  ".cache/dataset/task" \
   "$DEST"
 
 echo "Successfully rsync dataset in .cache to A3 at $DEST"
