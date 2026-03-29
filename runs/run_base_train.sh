@@ -20,7 +20,7 @@ echo "Detected device type: $DEVICE_TYPE"
 
 if [ $DEVICE_TYPE == "npu" ]; then
     echo "Training on NPU"
-    torchrun --standalone --nproc_per_node=1 -m scripts.base_train -- \
+    torchrun --standalone --nproc_per_node=16 --master-addr=127.0.0.1 -m scripts.base_train -- \
         --depth=4 \
         --head-dim=16 \
         --window-pattern=L \
