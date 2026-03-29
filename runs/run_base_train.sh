@@ -15,7 +15,8 @@ MASTER_PORT="${MASTER_PORT:-29500}"
 LOCAL_ADDR="${LOCAL_ADDR:-127.0.0.1}"
 
 DATE=$(date +%Y%m%d%H%M%S)
-WANDB_RUN="nanochat-ascend-base-train-d20-test-iteration-1000-${DATE}"
+WANDB_RUN="nanochat-ascend-base-train-d20-${DATE}"
+#WANDB_RUN="dummy"
 
 DEVICE_TYPE="cpu"
 if command -v npu-smi >/dev/null 2>&1 && npu-smi info >/dev/null 2>&1; then
@@ -33,15 +34,12 @@ if [ "$DEVICE_TYPE" == "npu" ]; then
         --max-seq-len=2048 \
         --device-batch-size=8 \
         --total-batch-size=-1 \
-        --eval-every=250 \
-        --eval-tokens=524288 \
-        --core-metric-every=250 \
-        --core-metric-max-per-task=50 \
-        --sample-every=250 \
-        --save-every=250 \
-        --num-iterations=1000 \
+        --eval-every=1000 \
+        --core-metric-every=2000 \
+        --sample-every=2000 \
+        --save-every=2000 \
         --run=$WANDB_RUN \
-        --model-tag="d20-test-iteration-1000"
+        --model-tag="d20"
 else
     if [ "$PARALLEL_TRAIN" -eq 1 ]; then # (TODO) parallel training still not working. comming later
         NUM_CPU=$(lscpu | grep "^CPU(s):" | awk '{print $2}')
