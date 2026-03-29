@@ -34,6 +34,7 @@ if [ "$DEVICE_TYPE" == "npu" ]; then
         --max-seq-len=2048 \
         --device-batch-size=8 \
         --total-batch-size=-1 \
+        --target-param-data-ratio=20 \
         --eval-every=1000 \
         --core-metric-every=2000 \
         --sample-every=2000 \
