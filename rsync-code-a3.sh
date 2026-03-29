@@ -7,7 +7,7 @@ set -euo pipefail
 
 DEST="root@a3:/data/ldeng/code/nanochat-ascend"
 
-echo "Rsyncing code to A3 at $DEST"
+echo "Start to rsync code to A3 at $DEST"
 
 # Run from repository root so relative paths always resolve.
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -26,4 +26,4 @@ rsync -avz \
   "tests" \
   "$DEST"
 
-echo "Done"
+echo "Successfully rsync code to A3 at $DEST"
