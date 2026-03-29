@@ -78,7 +78,7 @@ if pretrain_batch_size is not None and args.device_batch_size > pretrain_batch_s
     print0(f"FOOTGUN WARNING: base model training used device_batch_size {pretrain_batch_size}, did you pass in a good --device-batch-size to this script?")
 orig_model = model
 if get_global_config().enforce_eager:
-    print0("torch.compile disabled (NANOCHAT_ENFORCE_EAGER=1)")
+    print0("torch.compile disabled (enforce_eager=true)")
 elif device_type == "npu":
     import torchair
     npu_backend = torchair.get_npu_backend(compiler_config=torchair.CompilerConfig())

@@ -10,17 +10,27 @@ Further contributions from @karpathy and @chrisjmccormick.
 import torch
 import torch.distributed as dist
 from torch import Tensor
+from nanochat.common import get_global_config
+import warnings
 
-# torch.compile decorator: respects NANOCHAT_ENFORCE_EAGER env var,
+ 
+# torch.compile decorator: respects global config enforce_eager,
 # uses torchair backend on Ascend NPU, and inductor elsewhere.
 def _get_compile_decorator(**kwargs):
-    import os
-    if os.environ.get("NANOCHAT_ENFORCE_EAGER", "") == "1":
+    if get_global_config().enforce_eager:
         return lambda fn: fn
     if hasattr(torch, 'npu') and torch.npu.is_available():
-        import torchair
-        npu_backend = torchair.get_npu_backend(compiler_config=torchair.CompilerConfig())
-        return torch.compile(backend=npu_backend, **kwargs)
+        try:
+            import torchair
+            npu_backend = torchair.get_npu_backend(compiler_config=torchair.CompilerConfig())
+            return torch.compile(backend=npu_backend, **kwargs)
+        except Exception as exc:  # pragma: no cover - depends on NPU runtime env
+            warnings.warn(
+                f"Failed to initialize torchair compile backend; falling back to eager mode. "
+                f"Set enforce_eager=true in configs/global.yaml to silence this warning. Cause: {exc}",
+                RuntimeWarning,
+            )
+            return lambda fn: fn
     return torch.compile(**kwargs)
 
 _compile = _get_compile_decorator(dynamic=False, fullgraph=True)

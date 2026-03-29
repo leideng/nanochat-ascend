@@ -185,12 +185,15 @@ def main(argv=None):
 
     orig_model = model
     if get_global_config().enforce_eager:
-        print0("torch.compile disabled (NANOCHAT_ENFORCE_EAGER=1)")
+        print0("torch.compile disabled (enforce_eager=true)")
     elif device_type == "npu":
-        import torchair
+        try:
+            import torchair
 
-        npu_backend = torchair.get_npu_backend(compiler_config=torchair.CompilerConfig())
-        model = torch.compile(model, backend=npu_backend, dynamic=False)
+            npu_backend = torchair.get_npu_backend(compiler_config=torchair.CompilerConfig())
+            model = torch.compile(model, backend=npu_backend, dynamic=False)
+        except Exception as exc:
+            print0(f"WARNING: failed to initialize torchair compile backend, falling back to eager mode. Cause: {exc}")
     else:
         model = torch.compile(model, dynamic=False)
 
