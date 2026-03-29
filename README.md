@@ -65,3 +65,37 @@ bash runs/run_cpu.sh
 # Full NPU pipeline, only on Ascend hardware
 bash runs/run_npu.sh
 ```
+
+## Rsync Helpers For A3
+
+These scripts help sync code, datasets, checkpoints, and outputs between local and A3.
+Run them from the repo root:
+
+```bash
+bash rsync-code-to-a3.sh
+bash rsync-dataset-to-a3.sh
+bash rsync-ckpt-from-a3.sh
+bash rsync-output-from-a3.sh
+```
+
+### What Each Script Does
+
+- `rsync-code-to-a3.sh`
+  - Pushes code from local repo to `root@a3:/data/ldeng/code/nanochat-ascend`.
+  - Syncs: `pyproject.toml`, `.python-version`, `configs/`, `nanochat/`, `runs/`, `scripts/`, `tasks/`, `tests/`.
+  - Excludes `__pycache__/` and `*.pyc`.
+
+- `rsync-dataset-to-a3.sh`
+  - Pushes selected local datasets to `root@a3:/data/ldeng/code/nanochat-ascend/.cache/dataset/`.
+  - Syncs only `.cache/dataset/eval` and `.cache/dataset/task`.
+  - Does **not** sync the pretrain dataset; pretrain data should be set manually on A3.
+
+- `rsync-ckpt-from-a3.sh`
+  - Pulls checkpoints from `root@a3:/data/ldeng/code/nanochat-ascend/.cache/checkpoint`.
+  - Syncs `base`, `chatsft`, and `chatrl` into local `.cache/checkpoint/`.
+  - Creates local `.cache/checkpoint/` if missing.
+
+- `rsync-output-from-a3.sh`
+  - Pulls the full output directory from `root@a3:/data/ldeng/code/nanochat-ascend/.cache/output/`.
+  - Writes into local `.cache/output/`.
+  - Creates local `.cache/output/` if missing.
