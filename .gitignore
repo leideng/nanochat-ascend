@@ -210,3 +210,4 @@ __marimo__/
 leo-gitops/
 .cache
 wandb
+uv.lock
