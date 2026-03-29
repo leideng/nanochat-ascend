@@ -41,7 +41,7 @@ If a task uses the wrapper scripts under `runs/`, those scripts may source `runs
 CPU machine:
 
 ```bash
-uv sync
+uv sync --extra cpu
 ```
 
 Ascend NPU machine:

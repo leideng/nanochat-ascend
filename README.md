@@ -19,7 +19,7 @@ If you use the wrapper scripts under `runs/`, they will source `runs/set_env.sh`
 CPU environment:
 
 ```bash
-uv sync
+uv sync --extra cpu
 ```
 
 Ascend NPU environment:
@@ -27,8 +27,6 @@ Ascend NPU environment:
 ```bash
 uv sync --extra npu
 ```
-
-In this repo, `uv sync` is the default CPU setup path and is equivalent in practice to `uv sync --extra cpu`.
 
 ## Notes
 
