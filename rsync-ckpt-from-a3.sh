@@ -17,9 +17,9 @@ mkdir -p ".cache/checkpoint"
 
 # Pull checkpoints from A3 to local machine.
 rsync -avz --info=progress2 --human-readable \
-  "$SRC_BASE/base" \
-  "$SRC_BASE/chatsft" \
-  "$SRC_BASE/chatrl" \
+  "$SRC_BASE/base_checkpoints" \
+  "$SRC_BASE/chatsft_checkpoints" \
+  "$SRC_BASE/chatrl_checkpoints" \
   ".cache/checkpoint/"
 
 echo "Successfully synced checkpoints from A3 to local .cache/checkpoint/"
