@@ -1,6 +1,6 @@
 dataset:
   root: .cache/dataset
-  pretrain: pretrain/fineweb-edu-100b-shuffle-sample
+  pretrain: pretrain/fineweb-edu-100b-shuffle
   eval: eval # source: https://karpathy-public.s3.us-west-2.amazonaws.com/eval_bundle.zip
   task:
     root: task
