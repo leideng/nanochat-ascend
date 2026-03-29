@@ -2,7 +2,7 @@
 set -euo pipefail
 
 # Usage:
-#   bash rsync-ckp-from-a3.sh
+#   bash rsync-ckpt-from-a3.sh
 
 SRC_BASE="root@a3:/data/ldeng/code/nanochat-ascend/.cache/checkpoint"
 

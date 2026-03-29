@@ -2,7 +2,7 @@
 set -euo pipefail
 
 # Usage:
-#   bash rsync-a3.sh
+#   bash rsync-code-to-a3.sh
 
 
 DEST="root@a3:/data/ldeng/code/nanochat-ascend"
