@@ -35,11 +35,11 @@ if [ "$DEVICE_TYPE" == "npu" ]; then
         --device-batch-size=4 \
         --total-batch-size=-1 \
         --target-param-data-ratio=20 \
-        --num-iterations=8000 \
-        --eval-every=1000 \
-        --core-metric-every=2000 \
-        --sample-every=2000 \
-        --save-every=2000 \
+        --num-iterations=2000 \
+        --eval-every=200 \
+        --core-metric-every=200 \
+        --sample-every=200 \
+        --save-every=500 \
         --run=$WANDB_RUN \
         --model-tag="d32"
 else
