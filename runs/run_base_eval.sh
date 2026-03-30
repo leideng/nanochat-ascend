@@ -2,16 +2,18 @@
 
 set -e
 
-source runs/set_env.sh
 
 [ -d ".venv" ] || uv venv
 source .venv/bin/activate
 
+source runs/set_env.sh
+
+MASTER_ADDR="${MASTER_ADDR:-127.0.0.1}"
+MASTER_PORT="${MASTER_PORT:-29500}"
+LOCAL_ADDR="${LOCAL_ADDR:-127.0.0.1}"
+
 # Evaluate the model
-python -m scripts.base_eval \
-    --model-tag="d4-test" \
-    --step=20 \
+torchrun --nproc_per_node=16 --master-addr="$MASTER_ADDR" --master-port="$MASTER_PORT" --local-addr="$LOCAL_ADDR" -m scripts.base_eval -- \
+    --model-tag="d20" \
     --device-batch-size=8 \
-    --split-tokens=1024 \
-    --max-per-task=16 \
-    --eval=bpb,sample
+    --eval=core,bpb,sample
