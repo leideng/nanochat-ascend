@@ -26,9 +26,9 @@ if [ "$DEVICE_TYPE" == "npu" ]; then
     torchrun --nproc_per_node=16 --master-addr="$MASTER_ADDR" --master-port="$MASTER_PORT" --local-addr="$LOCAL_ADDR" -m scripts.chat_rl -- \
         --model-tag="d20" \
         --num-epochs=1 \
-        --device-batch-size=8 \
-        --examples-per-step=16 \
-        --num-samples=16 \
+        --device-batch-size=48 \
+        --examples-per-step=48 \
+        --num-samples=48 \
         --max-new-tokens=256 \
         --temperature=1.0 \
         --top-k=50 \
