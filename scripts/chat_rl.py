@@ -19,6 +19,7 @@ torchrun --standalone --nproc_per_node=8 -m scripts.chat_rl -- --run=default
 import argparse
 import os
 import itertools
+import time
 import wandb
 import torch
 import torch.distributed as dist
@@ -220,7 +221,9 @@ print0(f"Calculated examples per rank: {examples_per_rank}")
 
 # Kick off the training loop
 batch_iterator = get_batch()
+total_training_time = 0.0
 for step in range(num_steps):
+    t0 = time.time()
 
     # Evaluate the model once in a while and log to wandb
     if step % args.eval_every == 0:
@@ -287,22 +290,29 @@ for step in range(num_steps):
         dist.all_reduce(mean_sequence_length_tensor, op=dist.ReduceOp.AVG)
         mean_reward = mean_reward_tensor.item()
         mean_sequence_length = mean_sequence_length_tensor.item()
-    print0(f"Step {step}/{num_steps} | Average reward: {mean_reward} | Average sequence length: {mean_sequence_length:.2f}")
-    wandb_run.log({
-        "step": step,
-        "reward": mean_reward,
-        "sequence_length": mean_sequence_length,
-    })
-
     # Update the model parameters
     lrm = get_lr_multiplier(step)
     for group in optimizer.param_groups:
         group["lr"] = group["initial_lr"] * lrm
     optimizer.step()
     model.zero_grad(set_to_none=True)
+    t1 = time.time()
+    dt = t1 - t0
+    total_training_time += dt
+    steps_done = step + 1
+    remaining_steps = num_steps - steps_done
+    avg_time_per_step = total_training_time / steps_done
+    eta_minutes = (remaining_steps * avg_time_per_step) / 60
+    print0(
+        f"Step {step}/{num_steps} | Average reward: {mean_reward} | Average sequence length: {mean_sequence_length:.2f} | lrm: {lrm:.2f} | total time: {total_training_time/60:.2f}m | eta: {eta_minutes:.2f}m"
+    )
     wandb_run.log({
         "step": step,
+        "reward": mean_reward,
+        "sequence_length": mean_sequence_length,
         "lrm": lrm,
+        "total_training_time": total_training_time,
+        "eta_minutes": eta_minutes,
     })
 
     # Master process saves the model once in a while. Skip first step. Save last step.
