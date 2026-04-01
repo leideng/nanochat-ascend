@@ -40,6 +40,7 @@ parser.add_argument("--dtype", type=str, default="bfloat16", help="float32|bfloa
 parser.add_argument("--model-tag", type=str, default=None, help="model tag to load from")
 parser.add_argument("--model-step", type=int, default=None, help="model step to load from")
 # Training horizon
+parser.add_argument("--num-steps", type=int, default=-1, help="number of steps to train for (-1 = full train)")
 parser.add_argument("--num-epochs", type=int, default=1, help="number of epochs over GSM8K")
 # Batch sizes / sampling
 parser.add_argument("--device-batch-size", type=int, default=8, help="max batch size per forward pass")
@@ -82,9 +83,12 @@ engine = Engine(model, tokenizer) # for sampling rollouts
 train_task = GSM8K(subset="main", split="train")
 val_task = GSM8K(subset="main", split="test")
 num_steps = (len(train_task) // args.examples_per_step) * args.num_epochs
+
+if args.num_steps > 0:
+    num_steps = min(args.num_steps,num_steps)
+
 print0(f"Calculated number of steps: {num_steps}")
 
-@torch.no_grad()
 def get_batch():
     assistant_end = tokenizer.encode_special("<|assistant_end|>") # ok to use this token, it's only for padding and isn't used in the loss.
     rank_indices = range(ddp_rank, len(train_task), ddp_world_size) # each rank is responsible for different examples in the training data
@@ -99,22 +103,23 @@ def get_batch():
         prefix_length = len(tokens)
 
         # Generate num_samples samples using batched generation, use loop to avoid OOMs
-        model.eval() # ensure the model is in eval mode
-        generated_token_sequences = []
-        masks = []
-        num_sampling_steps = args.num_samples // args.device_batch_size # go sequentially to prevent OOMs
-        for sampling_step in range(num_sampling_steps):
-            seed = hash((step, example_idx, sampling_step)) & 0x7FFFFFFF # positive half of int32
-            generated_token_sequences_batch, masks_batch = engine.generate_batch(
-                tokens,
-                num_samples=args.device_batch_size,
-                max_tokens=args.max_new_tokens,
-                temperature=args.temperature,
-                top_k=args.top_k,
-                seed=seed, # must make sure to change the seed for each sampling step
-            )
-            generated_token_sequences.extend(generated_token_sequences_batch)
-            masks.extend(masks_batch)
+        with torch.no_grad():
+            model.eval() # ensure the model is in eval mode
+            generated_token_sequences = []
+            masks = []
+            num_sampling_steps = args.num_samples // args.device_batch_size # go sequentially to prevent OOMs
+            for sampling_step in range(num_sampling_steps):
+                seed = hash((step, example_idx, sampling_step)) & 0x7FFFFFFF # positive half of int32
+                generated_token_sequences_batch, masks_batch = engine.generate_batch(
+                    tokens,
+                    num_samples=args.device_batch_size,
+                    max_tokens=args.max_new_tokens,
+                    temperature=args.temperature,
+                    top_k=args.top_k,
+                    seed=seed, # must make sure to change the seed for each sampling step
+                )
+                generated_token_sequences.extend(generated_token_sequences_batch)
+                masks.extend(masks_batch)
 
         # Calculate the rewards for each sample
         rewards = []
