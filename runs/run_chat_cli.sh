@@ -19,5 +19,5 @@ echo "Detected device type: $DEVICE_TYPE"
 
 python -m scripts.chat_cli \
     --model-tag="d20" \
-    --source="sft" \
+    --source="rl" \
     --device-type=$DEVICE_TYPE
