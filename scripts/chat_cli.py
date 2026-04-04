@@ -73,6 +73,13 @@ while True:
     conversation_tokens.extend(tokenizer.encode(user_input))
     conversation_tokens.append(user_end)
 
+    if len(conversation_tokens) > model.config.sequence_len:
+        print(f"Conversation length {len(conversation_tokens)} exceeds model sequence length {model.config.sequence_len}")
+        conversation_tokens = [bos]
+        print("Conversation cleared.")
+        print("Please pass a shorter prompt.")
+        continue
+
     # Kick off the assistant
     conversation_tokens.append(assistant_start)
     generate_kwargs = {
