@@ -106,9 +106,11 @@ bash rsync-output-from-a3.sh
 
 ### Test 1
 
-<video src="assets/d20-chat-cli-videos/d20-test1.webm" width="100%" controls></video>
+[Watch d20 Performance Test 1](assets/d20-chat-cli-videos/d20-test1.webm)
+
+[![d20 Test 1](assets/d20-chat-cli-videos/d20-test1-thumbnail.png)](assets/d20-chat-cli-videos/d20-test1.webm)
 
 
 ### Test 2
-<video src="assets/d20-chat-cli-videos/d20-test2.webm" width="100%" controls></video>
 
+[![d20 Test 2](assets/d20-chat-cli-videos/d20-test2-thumbnail.png)](assets/d20-chat-cli-videos/d20-test2.webm)
