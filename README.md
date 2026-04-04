@@ -99,3 +99,16 @@ bash rsync-output-from-a3.sh
   - Pulls the full output directory from `root@a3:/data/ldeng/code/nanochat-ascend/.cache/output/`.
   - Writes into local `.cache/output/`.
   - Creates local `.cache/output/` if missing.
+
+
+
+## Demo to Show d20 Performance
+
+### Test 1
+
+<video src="assets/d20-chat-cli-videos/d20-test1.webm" width="100%" controls></video>
+
+
+### Test 2
+<video src="assets/d20-chat-cli-videos/d20-test2.webm" width="100%" controls></video>
+
