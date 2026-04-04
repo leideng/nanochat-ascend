@@ -101,14 +101,6 @@ bash rsync-output-from-a3.sh
   - Creates local `.cache/output/` if missing.
 
 
-
-## Demo to Show d20 Performance
-
-### Test 1
+## d20 Demo
 
 [![d20 Test 1](assets/d20-chat-cli-videos/d20-test1-thumbnail.png)](assets/d20-chat-cli-videos/d20-test1.webm)
-
-
-### Test 2
-
-[![d20 Test 2](assets/d20-chat-cli-videos/d20-test2-thumbnail.png)](assets/d20-chat-cli-videos/d20-test2.webm)
