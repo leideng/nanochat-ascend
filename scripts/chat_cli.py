@@ -77,7 +77,6 @@ while True:
         print(f"Conversation length {len(conversation_tokens)} exceeds model sequence length {model.config.sequence_len}")
         conversation_tokens = [bos]
         print("Conversation cleared.")
-        print("Please pass a shorter prompt.")
         continue
 
     # Kick off the assistant
