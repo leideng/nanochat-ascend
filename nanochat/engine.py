@@ -188,6 +188,7 @@ class Engine:
 
         # No room left in the context window, so stop immediately.
         if max_tokens == 0:
+            print(f"No room left in the context window, so stop immediately. Prompt length: {prompt_len}, Model sequence length: {m.sequence_len}, Max tokens: {max_tokens}")
             return
         # NOTE: setting the dtype here and in this way is an ugly hack.
         # Currently the repo assumes that npu -> bfloat16 and everything else -> float32.
