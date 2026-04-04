@@ -173,15 +173,14 @@ class Engine:
         device = self.model.get_device()
         m = self.model.config
         prompt_len = len(tokens)
-        sequence_len = m.sequence_len
 
         # Enforce model context window: prompt + generated tokens must not exceed sequence_len.
-        if prompt_len > sequence_len:
+        if prompt_len > m.sequence_len:
             raise ValueError(
-                f"Prompt length ({prompt_len}) exceeds model sequence_len ({sequence_len}). "
+                f"Prompt length ({prompt_len}) exceeds model sequence_len ({m.sequence_len}). "
                 "Please pass a shorter prompt."
             )
-        available_tokens = sequence_len - prompt_len
+        available_tokens = m.sequence_len - prompt_len
         if max_tokens is None:
             max_tokens = available_tokens
         else:
