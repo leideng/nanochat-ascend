@@ -171,6 +171,25 @@ class Engine:
         """Same as generate, but does single prefill and then clones the KV cache."""
         assert isinstance(tokens, list) and isinstance(tokens[0], int), "expecting list of ints"
         device = self.model.get_device()
+        m = self.model.config
+        prompt_len = len(tokens)
+        sequence_len = m.sequence_len
+
+        # Enforce model context window: prompt + generated tokens must not exceed sequence_len.
+        if prompt_len > sequence_len:
+            raise ValueError(
+                f"Prompt length ({prompt_len}) exceeds model sequence_len ({sequence_len}). "
+                "Please pass a shorter prompt."
+            )
+        available_tokens = sequence_len - prompt_len
+        if max_tokens is None:
+            max_tokens = available_tokens
+        else:
+            max_tokens = min(max_tokens, available_tokens)
+
+        # No room left in the context window, so stop immediately.
+        if max_tokens == 0:
+            return
         # NOTE: setting the dtype here and in this way is an ugly hack.
         # Currently the repo assumes that npu -> bfloat16 and everything else -> float32.
         # We need to know the dtype here to call __init__ on KVCache and pre-allocate its tensors.
@@ -191,11 +210,10 @@ class Engine:
         bos = self.tokenizer.get_bos_token_id() # if sampled, ends row
 
         # 1) Run a batch 1 prefill of the prompt tokens
-        m = self.model.config
         kv_model_kwargs = {"num_heads": m.n_kv_head, "head_dim": m.n_embd // m.n_head, "num_layers": m.n_layer}
         kv_cache_prefill = KVCache(
             batch_size=1,
-            seq_len=len(tokens),
+            seq_len=prompt_len,
             device=device,
             dtype=dtype,
             **kv_model_kwargs,
@@ -205,7 +223,7 @@ class Engine:
         logits = logits[:, -1, :].expand(num_samples, -1)  # (num_samples, vocab_size)
 
         # 2) Replicate the KV cache for each sample/row
-        kv_length_hint = (len(tokens) + max_tokens) if max_tokens is not None else self.model.config.sequence_len
+        kv_length_hint = prompt_len + max_tokens
         kv_cache_decode = KVCache(
             batch_size=num_samples,
             seq_len=kv_length_hint,
