@@ -35,8 +35,8 @@ if [ "$DEVICE_TYPE" == "npu" ]; then
         --device-batch-size=4 \
         --total-batch-size=-1 \
         --target-param-data-ratio=20 \
-        --num-iterations=9500 \
-        --resume-from-step=8000 \
+        --num-iterations=11000 \
+        --resume-from-step=9500 \
         --eval-every=200 \
         --core-metric-every=200 \
         --sample-every=200 \
