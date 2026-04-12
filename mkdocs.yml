@@ -1,1 +1,29 @@
-site_name: My Docs
+site_name: nanochat-ascend
+site_description: Detailed documentation for the nanochat-ascend training, data, evaluation, and demo pipeline.
+docs_dir: docs
+theme:
+  name: mkdocs
+markdown_extensions:
+  - admonition
+  - attr_list
+  - tables
+  - toc:
+      permalink: true
+nav:
+  - Home: index.md
+  - Overview: overview.md
+  - Datasets:
+      - Overview: datasets/index.md
+      - Pretrain Dataset: datasets/pretrain.md
+      - SFT Datasets: datasets/sft.md
+      - RL Dataset: datasets/rl.md
+      - Base Evaluation Dataset: datasets/base-evaluation.md
+      - Chat Evaluation Datasets: datasets/chat-evaluation.md
+  - Model: model.md
+  - Processes:
+      - Dataset Preparation: processes/dataset-preparation.md
+      - Pretrain Process: processes/pretrain.md
+      - SFT Process: processes/sft.md
+      - RL Process: processes/rl.md
+  - Results: results.md
+  - Demo: demo.md
