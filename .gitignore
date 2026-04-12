@@ -212,3 +212,5 @@ leo-gitops/
 wandb
 uv.lock
 
+#helpful scripts
+./*.sh
