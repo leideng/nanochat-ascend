@@ -2,7 +2,17 @@ site_name: nanochat-ascend
 site_description: Detailed documentation for the nanochat-ascend training, data, evaluation, and demo pipeline.
 docs_dir: docs
 theme:
-  name: mkdocs
+  name: material
+  features:
+    - navigation.instant
+    - navigation.sections
+    - navigation.top
+    - content.code.copy
+    - navigation.tracking
+    - search.highlight
+    - search.share
+    - search.suggest
+    - toc.follow
 markdown_extensions:
   - admonition
   - attr_list
