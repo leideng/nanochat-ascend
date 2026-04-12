@@ -213,4 +213,4 @@ wandb
 uv.lock
 
 #helpful scripts
-./*.sh
+/*.sh
