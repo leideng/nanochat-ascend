@@ -49,6 +49,10 @@ dev = [
     "ipython>=9.10.0",
     "pytest",
 ]
+docs = [
+    "mkdocs>=1.6.1",
+    "mkdocs-material>=9.7.6",
+]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
