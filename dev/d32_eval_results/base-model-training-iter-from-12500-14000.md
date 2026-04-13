@@ -1,0 +1,50 @@
+## Base model training
+timestamp: 2026-04-13 08:56:50
+
+- run: nanochat-ascend-base-train-d32-20260412233533
+- device_type: 
+- depth: 32
+- aspect_ratio: 64
+- head_dim: 128
+- max_seq_len: 2048
+- window_pattern: L
+- num_iterations: 14,000
+- target_flops: -1.0000
+- target_param_data_ratio: 20.0000
+- device_batch_size: 4
+- total_batch_size: -1
+- embedding_lr: 0.3000
+- unembedding_lr: 0.0040
+- weight_decay: 0.2000
+- matrix_lr: 0.0200
+- scalar_lr: 0.5000
+- adam_beta1: 0.8000
+- adam_beta2: 0.9500
+- warmup_ratio: 0.0000
+- warmdown_ratio: 0.5000
+- final_lr_frac: 0.0000
+- resume_from_step: 12,500
+- eval_every: 200
+- eval_tokens: 20,971,520
+- core_metric_every: 200
+- core_metric_max_per_task: 500
+- sample_every: 200
+- save_every: 500
+- model_tag: d32
+- Number of parameters: 2,818,580,544
+- Number of FLOPs per token: 1.167699e+10
+- Calculated number of iterations: 14,000
+- Number of training tokens: 29,360,128,000
+- Tokens : Scaling params ratio: 17.4999
+- DDP world size: 16
+- warmup_ratio: 0.0000
+- warmdown_ratio: 0.5000
+- final_lr_frac: 0.0000
+- Minimum validation bpb: 0.7079
+- Final validation bpb: 0.7079
+- CORE metric estimate: 0.2925
+- MFU %: 0.00%
+- Total training flops: 3.428380e+20
+- Total training time: 5020.12m
+- Peak memory usage: 47633.84MiB
+
