@@ -350,7 +350,20 @@ while True:
     mfu = 100 * flops_per_sec / promised_flops_per_sec_h100 # in %
     if step > 10:
         total_training_time += dt # only count the time after the first 10 steps
-    print0(f"step {step:05d} ({pct_done:.2f}%) | loss: {debiased_smooth_loss:.6f} | lrm: {lrm:.2f} | dt: {dt * 1000:.2f}ms | tok/sec: {tok_per_sec:,} | mfu: {mfu:.2f} | epoch: {current_epoch} | total time: {total_training_time/60:.2f}m")
+    steps_done = step - 10
+    if steps_done > 0:
+        avg_time_per_step = total_training_time / steps_done
+        if args.num_iterations > 0:
+            remaining_steps = max(args.num_iterations - step, 0)
+        elif progress > 0:
+            estimated_total_steps = step / progress
+            remaining_steps = max(estimated_total_steps - step, 0)
+        else:
+            remaining_steps = 0
+        eta_str = f" | eta: {remaining_steps * avg_time_per_step / 60:.1f}m" if remaining_steps > 0 else ""
+    else:
+        eta_str = ""
+    print0(f"step {step:05d} ({pct_done:.2f}%) | loss: {debiased_smooth_loss:.6f} | lrm: {lrm:.2f} | dt: {dt * 1000:.2f}ms | tok/sec: {tok_per_sec:,} | mfu: {mfu:.2f} | epoch: {current_epoch} | total time: {total_training_time/60:.2f}m{eta_str}")
     if step % 10 == 0:
         wandb_run.log({
             "step": step,
