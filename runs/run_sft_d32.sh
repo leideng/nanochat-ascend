@@ -27,7 +27,7 @@ if [ "$DEVICE_TYPE" == "npu" ]; then
         --model-tag="d32" \
         --max-seq-len=2048 \
         --num-iterations=-1 \
-        --device-batch-size=8 \
+        --device-batch-size=4 \
         --eval-every=150 \
         --run=$WANDB_RUN
 else
