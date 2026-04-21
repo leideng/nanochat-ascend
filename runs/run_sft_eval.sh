@@ -16,4 +16,5 @@ LOCAL_ADDR="${LOCAL_ADDR:-127.0.0.1}"
 torchrun --nproc_per_node=16 --master-addr="$MASTER_ADDR" --master-port="$MASTER_PORT" --local-addr="$LOCAL_ADDR" -m scripts.chat_eval -- \
     --source="rl" \
     --model-tag="d32" \
+    --step=120 \
     --batch-size=48
