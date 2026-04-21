@@ -1,7 +1,7 @@
 # nanochat-ascend
 
-[![Hugging Face Model](https://img.shields.io/badge/HuggingFace-Model-yellow?logo=huggingface)](https://huggingface.co/leideng/nanochat-ascend-d32-rl-pt)
-[![Hugging Face Dataset](https://img.shields.io/badge/HuggingFace-Dataset-yellow?logo=huggingface)](https://huggingface.co/datasets/leideng/nanochat-ascend-dataset)
+[![Hugging Face Model](https://img.shields.io/badge/%F0%9F%A4%97%20Hugging%20Face-nanochat--ascend-ffc107?color=ffc107&logoColor=white)](https://huggingface.co/leideng/nanochat-ascend-d32-rl-pt)
+[![Hugging Face Dataset](https://img.shields.io/badge/%F0%9F%A4%97%20Dataset-nanochat--ascend-ffc107?color=ffc107&logoColor=white)](https://huggingface.co/datasets/leideng/nanochat-ascend-dataset)
 
 Training Karpathy's nanochat on Huawei Ascend NPU, with CPU support for local development and very small-scale tests.
 
