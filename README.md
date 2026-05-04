@@ -41,7 +41,11 @@ uv sync --extra npu
 
 ## Common Workflows
 
-Common entrypoints from the repo root:
+Common entrypoints from the repo root.
+
+>[!NOTE]
+>
+>It is recommended to run workflows phase by phase. The generated output of the current phase will be saved in the corresponding folder specified in [configs/global.yaml] such that the next phase can read from the saved folder.
 
 ```bash
 # Load config for manual commands
@@ -59,11 +63,10 @@ bash runs/run_base_train.sh
 # Evaluate base model
 bash runs/run_base_eval.sh
 
-
 # Run SFT
 bash runs/run_sft.sh
 
-# Run RF
+# Run RL
 bash runs/run_rl.sh
 
 # Evaluate chat model after SFT/RL
