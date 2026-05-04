@@ -83,8 +83,14 @@ bash runs/run_sft_eval.sh
 | nanochat-ascend d20 — base evaluation | [base-model-evaluation.md](dev/d20_eval_results/base-model-evaluation.md) |
 | nanochat-ascend d32 — pretraining | [base-model-training (iter 16k–17k).md](dev/d32_eval_results/base-model-training-iter-from-16000-to-17000.md) |
 | nanochat-ascend d32 — base evaluation | [base-model-evaluation.md](dev/d32_eval_results/base-model-evaluation.md) |
+| nanochat-ascend d20 — chat (`chat_eval` after SFT) | [chat-evaluation-sft.md](dev/d20_eval_results/chat-evaluation-sft.md) |
+| nanochat-ascend d20 — chat (`chat_eval` after RL) | [chat-evaluation-rl.md](dev/d20_eval_results/chat-evaluation-rl.md) |
+| nanochat-ascend d32 — chat (`chat_eval` after SFT) | [chat-evaluation-sft.md](dev/d32_eval_results/chat-evaluation-sft.md) |
+| nanochat-ascend d32 — chat (`chat_eval` after RL) | [chat-evaluation-rl.md](dev/d32_eval_results/chat-evaluation-rl.md) |
 | Karpathy d20 (upstream speedrun) | [nanochat gitHub discussion #1](https://github.com/karpathy/nanochat/discussions/1) |
 | Karpathy d32 (upstream $1000 run) | [nanochat gitHub discussion #8](https://github.com/karpathy/nanochat/discussions/8) |
+
+### Base pretraining
 
 Comparison of base pretraining runs versus upstream nanochat. **Depth labels are not the same architecture:** nanochat-ascend uses a wider configuration at a given depth, so parameter counts and compute differ from Karpathy’s runs.
 
@@ -102,6 +108,33 @@ nanochat-ascend defaults to **eager** execution (`enforce_eager: true` in [`conf
 | **Final val BPB** | 0.7811 | 0.81 | 0.7026 | 0.7236 |
 | **CORE** (`base_eval`) | 0.2167 | 0.2219 | 0.2881 | 0.3168 |
 
+### Chat evaluation (after SFT and RL)
+
+From `scripts.chat_eval` (generative / task metrics as reported in the logs and in Karpathy’s run reports). **Karpathy d20** uses GSM8K-only eval after RL (`chat_eval -i rl -a GSM8K` in [Discussion #1](https://github.com/karpathy/nanochat/discussions/1)); the speedrun **report card** does not list ChatCORE or non-GSM8K tasks for that RL stage. **Karpathy d32**’s published summary table ([Discussion #8](https://github.com/karpathy/nanochat/discussions/8)) lists **GSM8K** for RL but not ChatCORE or other tasks in that column.
+
+#### After SFT (`chat_eval -i sft`)
+
+| Metric | nanochat-ascend d20 | Karpathy d20 | nanochat-ascend d32 | Karpathy d32 |
+| --- | --- | --- | --- | --- |
+| **ChatCORE** | 0.2600 | 0.0884 | 0.3024 | 0.2734 |
+| **ARC-Easy** | 0.4306 | 0.3876 | 0.4874 | 0.6797 |
+| **ARC-Challenge** | 0.3387 | 0.2807 | 0.3916 | 0.4991 |
+| **MMLU** | 0.3398 | 0.3151 | 0.3541 | 0.4049 |
+| **GSM8K** | 0.0235 | 0.0455 | 0.0485 | 0.1274 |
+| **HumanEval** | 0.0732 | 0.0854 | 0.1220 | 0.1280 |
+| **SpellingBee** | 0.9844 | — | 1.0000 | — |
+
+#### After RL (`chat_eval -i rl`)
+
+| Metric | nanochat-ascend d20 | Karpathy d20 | nanochat-ascend d32 | Karpathy d32 |
+| --- | --- | --- | --- | --- |
+| **ChatCORE** | 0.2617 | — | 0.3108 | — |
+| **ARC-Easy** | 0.4272 | — | 0.4920 | — |
+| **ARC-Challenge** | 0.3464 | — | 0.3891 | — |
+| **MMLU** | 0.3374 | — | 0.3516 | — |
+| **GSM8K** | 0.1585 | 0.0758 | 0.2070 | 0.1994 |
+| **HumanEval** | 0.0122 | — | 0.0183 | — |
+| **SpellingBee** | 0.9180 | — | 0.9961 | — |
 
 ## d20 Demo
 
