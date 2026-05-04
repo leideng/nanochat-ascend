@@ -100,7 +100,7 @@ nanochat-ascend defaults to **eager** execution (`enforce_eager: true` in [`conf
 | **Iterations** | 8,300 | 21,400 | 17,000 | 71,680 |
 | **Total training FLOPs** | 2.82×10¹⁹ | 3.92×10¹⁹ | 4.16×10²⁰ | 4.54×10²⁰ |
 | **Final val BPB** | 0.7811 | 0.81 | 0.7026 | 0.7236 |
-| **CORE** (`base_eval`) | 0.2167 | ~0.22 | 0.2881 | 0.3168 |
+| **CORE** (`base_eval`) | 0.2167 | 0.2219 | 0.2881 | 0.3168 |
 
 
 ## d20 Demo
