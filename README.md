@@ -47,26 +47,27 @@ Common entrypoints from the repo root:
 # Load config for manual commands
 source runs/set_env.sh
 
-# Prepare datasets and install the right dependency extra for this machine
+# Download and Prepare datasets
 bash runs/prepare_dataset.sh
 
 # Train and evaluate the tokenizer
 bash runs/run_tok_train.sh
 
-# Tiny base-train smoke run
+# Pretraining
 bash runs/run_base_train.sh
 
-# Evaluate the smoke-run checkpoint
+# Evaluate base model
 bash runs/run_base_eval.sh
 
-# Tiny SFT smoke run
+
+# Run SFT
 bash runs/run_sft.sh
 
-# Full CPU demo pipeline
-bash runs/run_cpu.sh
+# Run RF
+bash runs/run_rl.sh
 
-# Full NPU pipeline, only on Ascend hardware
-bash runs/run_npu.sh
+# Evaluate chat model after SFT/RL
+bash runs/run_sft_eval.sh
 ```
 
 
