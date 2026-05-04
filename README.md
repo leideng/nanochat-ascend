@@ -73,6 +73,35 @@ bash runs/run_rl.sh
 bash runs/run_sft_eval.sh
 ```
 
+## Performance
+
+### Data sources
+
+| Reference | Source |
+| --- | --- |
+| nanochat-ascend d20 — pretraining | [base-model-training.md](dev/d20_eval_results/base-model-training.md) |
+| nanochat-ascend d20 — base evaluation | [base-model-evaluation.md](dev/d20_eval_results/base-model-evaluation.md) |
+| nanochat-ascend d32 — pretraining | [base-model-training (iter 16k–17k).md](dev/d32_eval_results/base-model-training-iter-from-16000-to-17000.md) |
+| nanochat-ascend d32 — base evaluation | [base-model-evaluation.md](dev/d32_eval_results/base-model-evaluation.md) |
+| Karpathy d20 (upstream speedrun) | [GitHub Discussion #1](https://github.com/karpathy/nanochat/discussions/1) |
+| Karpathy d32 (upstream $1000 run) | [GitHub Discussion #8](https://github.com/karpathy/nanochat/discussions/8) |
+
+Comparison of base pretraining runs versus upstream nanochat. **Depth labels are not the same architecture:** nanochat-ascend uses a wider configuration at a given depth, so parameter counts and compute differ from Karpathy’s runs.
+
+nanochat-ascend defaults to **eager** execution (`enforce_eager: true` in [`configs/global.yaml`](configs/global.yaml)). Upstream trains with **`torch.compile`** on CUDA (graph mode). **Vocab size** here is 32,768 (2^15) in this fork’s model config ([`nanochat/gpt.py`](nanochat/gpt.py)), versus 65,536 (2^16) in upstream nanochat ([Discussion #1](https://github.com/karpathy/nanochat/discussions/1)).
+
+| Metric | nanochat-ascend d20 | Karpathy d20 | nanochat-ascend d32 | Karpathy d32 |
+| --- | --- | --- | --- | --- |
+| **Parameters** | 896,535,720 | 560,988,160 | 2,818,580,544 | 1,879,048,192 |
+| **Vocab size** | 32,768 (2^15) | 65,536 (2^16) | 32,768 (2^15) | 65,536 (2^16) |
+| **Training Model** | Eager | `torch.compile` (CUDA) | Eager | `torch.compile` (CUDA) |
+| **Training tokens** | 8,703,180,800 | 11,219,763,200 | 35,651,584,000 | 37,580,963,840 |
+| **Tokens∶params** | 9.7 | 20.0 | 12.6 | 20.0 |
+| **Iterations** | 8,300 | 21,400 | 17,000 | 71,680 |
+| **Total training FLOPs** | 2.82×10¹⁹ | 3.92×10¹⁹ | 4.16×10²⁰ | 4.54×10²⁰ |
+| **Final val BPB** | 0.7811 | 0.81 | 0.7026 | 0.7236 |
+| **CORE** (`base_eval`) | 0.2167 | ~0.22 | 0.2881 | 0.3168 |
+
 
 ## d20 Demo
 
