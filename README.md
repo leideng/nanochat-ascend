@@ -45,7 +45,7 @@ Common entrypoints from the repo root.
 
 >[!NOTE]
 >
->It is recommended to run workflows phase by phase. The generated output of the current phase will be saved in the corresponding folder specified in [configs/global.yaml] such that the next phase can read from the saved folder.
+>It is recommended to run workflows phase by phase. The generated output of the current phase will be saved in the corresponding folder specified in [the config file](configs/global.yaml) such that the next phase can read from the saved folder.
 
 ```bash
 # Load config for manual commands
