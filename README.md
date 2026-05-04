@@ -83,8 +83,8 @@ bash runs/run_sft_eval.sh
 | nanochat-ascend d20 — base evaluation | [base-model-evaluation.md](dev/d20_eval_results/base-model-evaluation.md) |
 | nanochat-ascend d32 — pretraining | [base-model-training (iter 16k–17k).md](dev/d32_eval_results/base-model-training-iter-from-16000-to-17000.md) |
 | nanochat-ascend d32 — base evaluation | [base-model-evaluation.md](dev/d32_eval_results/base-model-evaluation.md) |
-| Karpathy d20 (upstream speedrun) | [GitHub Discussion #1](https://github.com/karpathy/nanochat/discussions/1) |
-| Karpathy d32 (upstream $1000 run) | [GitHub Discussion #8](https://github.com/karpathy/nanochat/discussions/8) |
+| Karpathy d20 (upstream speedrun) | [nanochat gitHub discussion #1](https://github.com/karpathy/nanochat/discussions/1) |
+| Karpathy d32 (upstream $1000 run) | [nanochat gitHub discussion #8](https://github.com/karpathy/nanochat/discussions/8) |
 
 Comparison of base pretraining runs versus upstream nanochat. **Depth labels are not the same architecture:** nanochat-ascend uses a wider configuration at a given depth, so parameter counts and compute differ from Karpathy’s runs.
 
